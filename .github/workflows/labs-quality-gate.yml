@@ -1,0 +1,24 @@
+name: Labs Quality Gate
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-labs:
+    name: Validate Labs Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run labs quality gate
+        shell: bash
+        run: |
+          chmod +x scripts/validate-labs.sh
+          ./scripts/validate-labs.sh
