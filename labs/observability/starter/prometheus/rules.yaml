@@ -1,0 +1,6 @@
+groups:
+- name: starter-rules
+  rules:
+  - alert: HighErrorRateStarter
+    expr: rate(http_requests_total{status=~"5.."}[5m]) > 1
+    for: 5m
