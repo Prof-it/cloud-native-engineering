@@ -1,3 +1,35 @@
+# License
+
+All materials in this repository (software, educational content, diagrams, documentation, curricula, and associated assets) are © 2026 [Prof-it].
+
+- You may use, copy, and modify these materials **for non-commercial purposes only**, with proper attribution.
+- **Commercial use is strictly prohibited** without a separate commercial license from the authors. This includes use in paid products, commercial training, consulting, or any activity with a primary intent of commercial advantage or monetary compensation.
+- The license applies to all text, code, images, diagrams, documentation, and educational resources in this repository.
+
+For commercial licensing inquiries, please contact: Prof.dr.rer.nat.lu@gmail.com
+
+See the [LICENSE](./LICENSE) file for full terms.
+# License FAQ
+
+**Q: Can I use these materials in my open-source project?**  
+A: Yes, as long as your project is non-commercial and you provide proper attribution.
+
+**Q: Can I use parts of this repo for my own public educational purposes?**  
+A: Yes, provided you do so non-commercially and maintain attribution.
+
+**Q: Can I use this in a paid course or training, or as part of consulting services?**  
+A: No, commercial use is strictly prohibited without a separate license agreement. Please contact us to discuss commercial licensing.
+
+**Q: Does the license cover diagrams, images and text?**  
+A: Yes. The license applies to all code, diagrams, images, content, and educational materials in this repository.
+
+**Q: What if I want to make a change or improvement?**  
+A: You are encouraged to contribute improvements for non-commercial use! You must credit your changes and the original authors.
+
+**Q: What about dependencies or referenced third-party material?**  
+A: You must comply with the license terms of any included third-party material, which may differ from this license.
+
+
 # Cloud Native Engineering Knowledge Base
 
 ## Mission
