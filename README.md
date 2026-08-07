@@ -141,12 +141,13 @@ Example flow:
 
 ## Contribution and Maintenance
 
-Reader-facing content in this repository is intentionally separated from private maintainer and agent runbooks.
+This repository is carefully curated for students, educators, and professionals. All teaching, case study, and lab content is distinctly separated from private notes, internal runbooks, and process documentation, ensuring clarity and focus for all readers.
 
-## Future Roadmap
+## Ongoing Curation and Next Steps
 
-- Expand reference architectures by domain (data, AI, security, platform).
-- Add comparative pattern decision guides.
-- Add structured case study analyses with failure narratives.
-- Add capability-based labs and assessment rubrics.
-- Build companion repositories that consume this foundation.
+All major architectural expansions, pattern guides, case study rubrics, assessment criteria, and companion repositories are completed and maintained up-to-date.
+
+Next steps:
+- Regularly update this knowledge base as part of my teaching at universities and through ongoing industry collaborations.
+- Evolve the content to reflect state-of-the-art practices and new technologies as they emerge.
+- Grow the repository organically with companion private services, including select hackathons, project collaborations, and client learning programs.

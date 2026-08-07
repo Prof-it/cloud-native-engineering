@@ -28,7 +28,7 @@ This pattern applies to cloud-native, Kubernetes-based, and multi-environment sy
 
 ## Pattern Structure
 
-All desired system state is stored in Git repositories. Automated agents (controllers) continuously reconcile actual state with Git, applying changes and reverting drift. Policy engines may enforce compliance and block unauthorized changes.
+All desired system state is stored in Git repositories. Reconciliation controllers continuously ensure the actual system state matches the Git repository, automatically applying changes and reverting drift. Policy engines can enforce compliance and block unauthorized changes if necessary.
 
 ## Architecture Impact
 
