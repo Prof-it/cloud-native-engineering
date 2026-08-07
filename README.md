@@ -106,8 +106,8 @@ Routing principle:
 
 Recommended organization:
 
-- Layer 1 foundation repository (this repository): `Prof-it/cloud-native-engineering`
-- Reference architecture repository: `Prof-it/reference-architectures`
+- Layer 1 foundation repository (this repository): [Prof-it/cloud-native-engineering](https://github.com/Prof-it/cloud-native-engineering)
+- Reference architecture repository: [Prof-it/reference-architectures](https://github.com/Prof-it/reference-architectures)
 
 ### What Belongs in This Repository
 
@@ -131,7 +131,7 @@ Recommended organization:
 
 ### Content Handoff Pattern
 
-Use this foundation repository to define principles and patterns, then publish concrete architecture blueprints in the reference-architectures repository that explicitly reference those principles.
+Use this foundation repository to define principles and patterns, then publish concrete architecture blueprints in the [reference-architectures repository](https://github.com/Prof-it/reference-architectures) that explicitly reference those principles.
 
 Example flow:
 
