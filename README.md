@@ -1,70 +1,52 @@
-# License
-
-All materials in this repository (software, educational content, diagrams, documentation, curricula, and associated assets) are © 2026 [Prof-it].
-
-- You may use, copy, and modify these materials **for non-commercial purposes only**, with proper attribution.
-- **Commercial use is strictly prohibited** without a separate commercial license from the authors. This includes use in paid products, commercial training, consulting, or any activity with a primary intent of commercial advantage or monetary compensation.
-- The license applies to all text, code, images, diagrams, documentation, and educational resources in this repository.
-
-For commercial licensing inquiries, please contact: Prof.dr.rer.nat.lu@gmail.com
-
-See the [LICENSE](./LICENSE) file for full terms.
-# License FAQ
-
-**Q: Can I use these materials in my open-source project?**  
-A: Yes, as long as your project is non-commercial and you provide proper attribution.
-
-**Q: Can I use parts of this repo for my own public educational purposes?**  
-A: Yes, provided you do so non-commercially and maintain attribution.
-
-**Q: Can I use this in a paid course or training, or as part of consulting services?**  
-A: No, commercial use is strictly prohibited without a separate license agreement. Please contact us to discuss commercial licensing.
-
-**Q: Does the license cover diagrams, images and text?**  
-A: Yes. The license applies to all code, diagrams, images, content, and educational materials in this repository.
-
-**Q: What if I want to make a change or improvement?**  
-A: You are encouraged to contribute improvements for non-commercial use! You must credit your changes and the original authors.
-
-**Q: What about dependencies or referenced third-party material?**  
-A: You must comply with the license terms of any included third-party material, which may differ from this license.
-
+<!-- Cloud Native Engineering Knowledge Base: Documentation README -->
 
 # Cloud Native Engineering Knowledge Base
 
-## Mission
+> **Vendor-neutral engineering knowledge for designing, building, operating, and evolving production-grade cloud-native systems.**
 
-This repository is a long-term, vendor-neutral engineering knowledge base for designing, building, operating, and evolving production-grade cloud-native systems. It is intended to remain relevant across teaching, consulting, enterprise training, and applied research over the next five years and beyond.
+This repository is a structured, continuously evolving knowledge base for **Cloud Computing, Distributed Systems, Cloud Native Architecture, DevOps, Platform Engineering, Observability, Security, Reliability, and AI infrastructure**.
 
-The repository is organized around engineering problems and decision-making, not around tools, clouds, or lecture sessions.
+It is developed from university teaching, applied research, and professional engineering practice, focusing on **engineering judgment rather than tool familiarity**.
 
-## Learning Philosophy
+The goal is not to provide another collection of technology-specific tutorials. Instead, the repository organizes the concepts, patterns, architectural approaches, and practical exercises needed to reason about complex cloud-native systems.
 
-The learning model used across this repository is:
+---
 
-WHY -> WHAT -> HOW -> TOOLS
+## Table of Contents
 
-Each topic starts from a real problem, explains core principles, then architecture and patterns, and only then discusses implementation and tools.
+- [Engineering First, Tools Second](#engineering-first-tools-second)
+- [Start Here: Learning Path](#start-here-learning-path)
+- [Repository Structure](#repository-structure)
+- [Why This Approach?](#why-this-approach)
+- [Who This Repository Is For](#who-this-repository-is-for)
+- [Teaching and Professional Use](#teaching-and-professional-use)
+- [Foundation and Specialization](#from-foundation-to-application)
+- [Engagement & Contribution](#engage-with-the-knowledge-base)
+- [License](#license)
+- [About the Author](#about-the-author)
 
-## Repository Structure
+---
 
-```text
-.
-|-- README.md
-|-- docs/
-|-- architecture/
-|   |-- diagrams/
-|   `-- reference-architectures/
-|-- patterns/
-|-- case-studies/
-|-- labs/
-|-- resources/
-`-- assets/
-```
+## Engineering First, Tools Second
 
-## Learning Path
+The learning approach follows:
 
-Start with the core path in `docs/00-learning-path.md` and then move through foundational reasoning documents before implementation domains.
+**WHY → WHAT → HOW → TOOLS**
+
+| Layer  | Question                        | Focus                                   |
+|--------|----------------------------------|-----------------------------------------|
+| **WHY**   | What problem are we solving?      | Requirements, constraints, trade-offs   |
+| **WHAT**  | What concepts and principles apply? | Systems, architecture, patterns      |
+| **HOW**   | How can the problem be addressed?  | Architectures, implementation approaches |
+| **TOOLS** | Which technologies can implement it?| Kubernetes, cloud platforms, CI/CD, IaC, etc. |
+
+> Tools change quickly. Engineering principles, architectural reasoning, and decision-making skills remain useful much longer.
+
+---
+
+## Start Here: Learning Path
+
+The recommended learning path progresses from foundational systems thinking toward modern cloud-native and AI infrastructure engineering:
 
 ```mermaid
 flowchart TD
@@ -82,72 +64,152 @@ flowchart TD
     L --> M[AI and Cloud Native]
 ```
 
+➡️ See the full learning path: [docs/00-learning-path.md](00-learning-path.md)
+
+---
+
+## Repository Structure
+
+The repository is organized by engineering knowledge domains, not just individual lectures.
+
+```
+cloud-native-engineering/
+│
+├── architecture/          # Architectural concepts and approaches
+├── assets/                # Images, diagrams, and supporting assets
+├── case-studies/          # Engineering scenarios and case studies
+├── docs/                  # Structured learning documentation (this folder)
+├── labs/                  # Practical exercises and experiments
+├── patterns/              # Reusable engineering patterns
+├── resources/             # Curated references and further resources
+├── scripts/               # Supporting scripts and automation
+│
+├── .github/               # Repository workflows and config
+├── .gitignore
+├── LICENSE
+└── README.md
+```
+
+See documentation in each folder for further details and entry points.
+
+---
+
+## Why This Approach?
+
+Typical cloud-native engineering is often taught through individual technologies (Docker → Kubernetes → Terraform → GitHub Actions → Cloud Provider).
+
+That approach can produce tool familiarity but does not necessarily develop sound engineering judgment.
+
+This knowledge base takes the opposite direction:
+
+**Problem → Principles → Architecture → Implementation → Technology**
+
+The emphasis is therefore on questions such as:
+- What problem are we actually solving?
+- What constraints matter?
+- Which architectural properties are required?
+- What trade-offs are involved?
+- Which patterns are applicable?
+- How should reliability, security, observability, and operability be addressed?
+- Only then: which technologies and platforms are appropriate?
+
+This makes the material useful across changing technology landscapes and cloud providers.
+
+---
+
 ## Who This Repository Is For
 
-This repository is designed for:
+- **Students:** Senior undergrad and Master's who want to understand cloud-native engineering beyond individual technologies. Useful for structured learning, exercises, projects, and technical preparation.
+- **Software, DevOps, Cloud & Platform Engineers:** Those who want to strengthen understanding of architectural and engineering principles.
+- **Architects:** For software, cloud, enterprise, and platform architects working on distributed/cloud systems.
+- **Educators & Trainers:** For instructors, lecturers, and consultants needing reusable, structured material for teaching cloud-native engineering.
+- **Engineering Leaders:** Technical leads who need a shared language around architecture, reliability, security, platform engineering, and technology decisions.
 
-- Senior undergraduate students and master students.
-- Software, DevOps, cloud, platform, and AI infrastructure engineers.
-- Technical and enterprise architects.
-- Instructors, trainers, and consultants building reusable curricula.
+---
 
-## How Other Repositories Build on This One
+## Teaching and Professional Use
 
-This repository provides foundational concepts, architecture language, and pattern catalogs that future repositories can reference directly. Domain-specific repositories should link here for principles and shared definitions instead of duplicating foundational material.
+This knowledge base is developed and used in university teaching in areas including Cloud Computing, DevOps, and Cloud Native Engineering.
 
-## Boundary and Routing
+It is designed to work both as:
+- a structured learning path,
+- a reference during courses,
+- supporting material for practical exercises,
+- a foundation for student projects,
+- and a reusable engineering reference beyond a single course.
 
-This repository is the canonical foundation layer for cloud-native engineering knowledge under the Prof-it GitHub organization.
+The same engineering foundations are applicable in professional development, enterprise training, and architecture initiatives.
 
-Routing principle:
+---
 
-- If content teaches universal principles, pattern logic, and decision trade-offs, it belongs here.
-- If content defines reusable solution-level blueprints for specific enterprise contexts, it belongs in the dedicated reference-architectures repository.
+## From Foundation to Application
 
-Recommended organization:
+This repository provides a public, vendor-neutral foundation:
+- engineering principles
+- architectural concepts
+- design patterns
+- decision frameworks
+- learning material
+- practical exercises
+- case studies
 
-- Layer 1 foundation repository (this repository): [Prof-it/cloud-native-engineering](https://github.com/Prof-it/cloud-native-engineering)
-- Reference architecture repository: [Prof-it/reference-architectures](https://github.com/Prof-it/reference-architectures)
+Material here can be adapted for:
+- university curriculum
+- professional training
+- enterprise engineering organizations
+- project-based education
+- AI, MLOps, or platform engineering
+- architecture and technology decision workshops
 
-### What Belongs in This Repository
+Specialized, domain-specific architectures build on—but do not duplicate—these foundations.
 
-- Core conceptual frameworks and system-level reasoning.
-- Vendor-neutral pattern definitions and decision matrices.
-- Teaching-oriented trade-off analysis and cross-topic vocabulary.
-- Methods and standards for producing architecture assets.
+---
 
-### What Belongs in the Reference Architectures Repository
+## Engage With the Knowledge Base
 
-- Domain blueprints such as enterprise SaaS platform, fintech cloud platform, AI RAG platform, LLMOps platform, multi-region cloud, zero-trust platform, and internal developer platform.
-- End-to-end architecture packs with context, constraints, diagrams, control models, and adaptation guidance.
-- Versioned blueprint releases and evolution history.
+This is a living, continuously improved engineering resource.
 
-### Practical Routing Rules
+If you find the material useful:
+- ⭐ **Star** the repository so others can discover it
+- 👀 **Watch** for updates
+- 💬 **Discuss** by starting conversations
+- 🐛 **Open issues** for errors, outdated information, or unclear explanations
+- 💡 **Suggest improvements or additional topics**
+- 🍴 **Fork** to experiment/adapt
+- 🔀 **Contribute** examples, labs, patterns, references, or improvements
 
-- Add content here when the answer is mostly WHY and WHAT.
-- Add content to reference-architectures when the answer is mostly HOW at solution architecture level.
-- Keep provider-specific mappings optional and in appendices, never as primary organization.
-- Link both repositories bidirectionally to avoid duplication.
+Feedback from students, educators, engineers, and practitioners is especially valued—it helps identify where explanations or learning material can be improved.
 
-### Content Handoff Pattern
-
-Use this foundation repository to define principles and patterns, then publish concrete architecture blueprints in the [reference-architectures repository](https://github.com/Prof-it/reference-architectures) that explicitly reference those principles.
-
-Example flow:
-
-1. Define resilience pattern and decision logic here.
-2. Apply the pattern in a fintech or SaaS reference architecture there.
-3. Feed lessons learned back here as generalized guidance.
+---
 
 ## Contribution and Maintenance
 
-This repository is carefully curated for students, educators, and professionals. All teaching, case study, and lab content is distinctly separated from private notes, internal runbooks, and process documentation, ensuring clarity and focus for all readers.
+This is a carefully curated public educational and engineering resource. Useful contributions include:
+- clarifications, corrections, improved explanations
+- new labs, examples, architecture diagrams, patterns, case studies
+- references or practical exercises
 
-## Ongoing Curation and Next Steps
+Please focus on reusable engineering knowledge (not private notes or organization-specific documentation).
 
-All major architectural expansions, pattern guides, case study rubrics, assessment criteria, and companion repositories are completed and maintained up-to-date.
+---
 
-Next steps:
-- Regularly update this knowledge base as part of my teaching at universities and through ongoing industry collaborations.
-- Evolve the content to reflect state-of-the-art practices and new technologies as they emerge.
-- Grow the repository organically with companion private services, including select hackathons, project collaborations, and client learning programs.
+## License
+
+The repository is publicly available for non-commercial educational use with attribution.
+- **Commercial use, including training/consulting, requires separate permission under the repository license.**
+- See [LICENSE](../LICENSE) for complete terms.
+- © 2026 Prof-it. All rights reserved except as expressly permitted by the license.
+
+---
+
+## About the Author
+
+**Prof. Dr. rer. nat. Tianxiang Lu, SFHEA, IEEE Senior Member**
+
+Professor of DevOps and Cloud Computing at IU International University of Applied Sciences, Germany. Dr. Lu holds a binational PhD in Computer Science (Saarland University, Germany & University of Lorraine, France), with foundational research at MPI, DFKI, and INRIA focused on automated reasoning, knowledge representation and formal verification.
+
+With more than 20 years of technical and consulting experience—including a decade of enterprise leadership in highly regulated industries such as financial services—Dr. Lu has architected and delivered cloud, DevSecOps, and AI solutions at scale.
+
+His research vision centers on Trustworthy AI Engineering: enabling reliable, secure, and verifiable AI in distributed and cloud-native systems. He is an IEEE Senior Member, SFHEA, contributor to the IEEE Functional Safety Standards Committee, and has supervised over 200 theses. He regularly speaks at major international conferences and is a recipient of multiple best paper awards.
+
+---
