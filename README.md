@@ -64,7 +64,7 @@ flowchart TD
     L --> M[AI and Cloud Native]
 ```
 
-➡️ See the full learning path: [docs/00-learning-path.md](00-learning-path.md)
+➡️ See the full learning path: [docs/00-learning-path.md](docs/00-learning-path.md)
 
 ---
 
