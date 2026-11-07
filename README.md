@@ -64,7 +64,7 @@ flowchart TD
     L --> M[AI and Cloud Native]
 ```
 
-➡️ See the full learning path: [docs/00-learning-path.md](00-learning-path.md)
+➡️ See the full learning path: [docs/00-learning-path.md](docs/00-learning-path.md)
 
 ---
 
@@ -197,7 +197,7 @@ Please focus on reusable engineering knowledge (not private notes or organizatio
 
 The repository is publicly available for non-commercial educational use with attribution.
 - **Commercial use, including training/consulting, requires separate permission under the repository license.**
-- See [LICENSE](../LICENSE) for complete terms.
+- See [LICENSE](LICENSE) for complete terms.
 - © 2026 Prof-it. All rights reserved except as expressly permitted by the license.
 
 ---

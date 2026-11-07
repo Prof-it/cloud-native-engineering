@@ -41,6 +41,8 @@ Digital banking platforms have engineered for and learned from a range of failur
 
 ## Further Reading
 
+- [Regulated Card Payments case architecture](../regulated-card-payments/README.md) (in this repository): a detailed, reviewable architecture for one regulated payment flow
+
 - [Thought Machine – Modern Core Banking Architectures](https://www.thoughtmachine.net/resources/modern-core-banking-architectures)
 - [Google Cloud – Digital Banking Reference Architecture](https://cloud.google.com/solutions/banking)
 - [InfoQ – Building a Digital Bank](https://www.infoq.com/presentations/building-digital-bank/)
