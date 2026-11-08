@@ -1,0 +1,113 @@
+# Security gate for pull requests into main.
+#
+# Eight control jobs produce normalised reports and negative-control (canary) reports.
+# The gate job evaluates them with the gate code and policy from the BASE branch, so a pull
+# request cannot weaken the gate that judges it. The workflow file itself still comes from
+# the pull request; code-owner review of .github/workflows/ (enforced by the platform) closes
+# that remaining path. See README.md in this folder.
+name: Security
+
+on:
+  pull_request:
+    branches: [main]
+  pull_request_review:
+    types: [submitted, dismissed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  control:
+    name: ${{ matrix.control }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        control: [tests, sast, sca, secrets, container, iac, dast, detection]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0            # secret scanning reads the history
+          persist-credentials: false
+      # Project-specific: runs the pinned scanner on the change and on its seeded insecure
+      # fixture, and writes evidence/reports/<control>.json and evidence/canaries/<control>.json.
+      # The tests job also writes evidence/inventory.json. Exit codes are not the decision;
+      # the gate decides from the reports.
+      - name: Run control and its negative control
+        run: ./ci/run-control.sh "${{ matrix.control }}"
+      - name: Keep the evidence, also after a failure
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: evidence-${{ matrix.control }}
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 90
+
+  gate:
+    name: Security gate
+    needs: control
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read             # read the conclusion of every control job
+      pull-requests: read       # read reviews for the protected-path rule
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      PR: ${{ github.event.pull_request.number }}
+      AUTHOR: ${{ github.event.pull_request.user.login }}
+    steps:
+      - name: Check out the pull request (only to list changed files)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+          path: change
+      - name: Check out the gate and policy from the base branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+          path: trusted
+          sparse-checkout: |
+            gate
+            policy
+            exceptions
+      - name: Collect evidence
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: evidence-*
+          merge-multiple: true
+          path: run
+      - name: Describe the run from platform records
+        env:
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          git -C change diff --name-only "$BASE_SHA...$HEAD_SHA" > changed.txt
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/attempts/$RUN_ATTEMPT/jobs" --paginate \
+            --jq '[.jobs[] | {name: .name, conclusion: .conclusion}]' > jobs.json
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR/reviews" --paginate \
+            --jq '[.[] | {user: .user.login, state: .state}]' > reviews.json
+          python3 trusted/gate/describe_run.py --jobs jobs.json --reviews reviews.json \
+            --changed changed.txt --author "$AUTHOR" --commit "$HEAD_SHA" \
+            --exceptions-dir trusted/exceptions --out run
+      - name: Evaluate with the trusted gate
+        run: python3 trusted/gate/gate.py evaluate run --policy trusted/policy/policy.json | tee decision.json
+      - name: Keep the decision
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: security-gate-decision
+          path: decision.json
+          if-no-files-found: error

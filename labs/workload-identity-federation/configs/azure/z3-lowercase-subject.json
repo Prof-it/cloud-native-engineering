@@ -1,0 +1,8 @@
+{
+  "description": "Immutable subject typed with a different letter case.",
+  "issuer": "https://token.actions.githubusercontent.com",
+  "subject": "repo:ShareTable@51234567/Website@712345678:ref:refs/heads/main",
+  "audiences": [
+    "api://AzureADTokenExchange"
+  ]
+}

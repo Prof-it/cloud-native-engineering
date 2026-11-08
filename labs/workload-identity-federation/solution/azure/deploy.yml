@@ -1,0 +1,100 @@
+# Build once, deploy by digest to Azure Container Apps, only from main, only through the
+# production environment. Reference workflow; not executed by the lab. Prerequisites are created
+# once by bootstrap.sh, never by this workflow.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npx eslint src/
+
+  build:
+    needs: lint
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      name: ${{ steps.name.outputs.name }}
+      digest: ${{ steps.image.outputs.digest }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Image name (registry paths must be lower case)
+        id: name
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Log in to GHCR (push to main only)
+        if: github.event_name == 'push'
+        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build, and push only from main
+        id: image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ steps.name.outputs.name }}:${{ github.sha }}
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production          # the OIDC subject becomes ...:environment:production
+    permissions:
+      contents: read
+      id-token: write                # only this job can request a token
+    env:
+      RG: rg-sharetable
+      APP: sharetable-app
+      IMAGE: ${{ needs.build.outputs.name }}@${{ needs.build.outputs.digest }}
+    steps:
+      - uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3.1.0
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Preflight - platform prerequisites are in place
+        run: |
+          state="$(az provider show -n Microsoft.App --query registrationState -o tsv)"
+          if [ "$state" != "Registered" ]; then
+            echo "::error::Microsoft.App is '$state'. Provider registration is a one-time platform task (bootstrap.sh), not a deployment step."
+            exit 1
+          fi
+      - name: Deploy the image by digest
+        run: az containerapp update --name "$APP" --resource-group "$RG" --image "$IMAGE"
+      - name: Smoke test the new revision
+        run: |
+          fqdn="$(az containerapp show --name "$APP" --resource-group "$RG" --query properties.latestRevisionFqdn -o tsv)"
+          running="$(az containerapp show --name "$APP" --resource-group "$RG" --query 'properties.template.containers[0].image' -o tsv)"
+          test "$running" = "$IMAGE" || { echo "::error::app runs $running, expected $IMAGE"; exit 1; }
+          for i in 1 2 3 4 5 6; do
+            if curl -fsS --max-time 10 "https://$fqdn/" -o /dev/null; then exit 0; fi
+            sleep $((i * 5))
+          done
+          echo "::error::new revision at $fqdn did not answer"; exit 1

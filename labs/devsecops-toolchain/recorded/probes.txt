@@ -1,0 +1,14 @@
+# Error-path probes: how each tool behaves when it cannot do its job.
+# Recorded with the versions in versions.txt; 'report' says whether a report file was written.
+bandit missing-path exit=0 report=yes
+  bandit errors: [{'filename': './does/not/exist', 'reason': 'No such file or directory'}] results: 0
+bandit syntax-error-file exit=0
+  bandit errors: [{'filename': 'broken.py', 'reason': 'syntax error while parsing AST from file'}] results: 0
+pip-audit missing-file exit=1 report=no
+gitleaks missing-path exit=1 report=none
+trivy-config missing-path exit=1 report=no
+trivy-config two-targets exit=1 report=no
+trivy-fs vuln-db-unreachable exit=1 report=no
+trivy-config --severity HIGH,CRITICAL on target: exit=0, report omits AWS-0089 (LOW, bucket logging) that the unfiltered scan lists
+bandit '# nosec' on a shell=True call: without --ignore-nosec the B602 finding is dropped (metrics _totals.nosec=1); with --ignore-nosec it is reported
+trivy-config checks bundle unreachable: logs an ERROR 'Falling back to embedded checks' and continues; results then come from the checks embedded in the binary, not from the latest bundle

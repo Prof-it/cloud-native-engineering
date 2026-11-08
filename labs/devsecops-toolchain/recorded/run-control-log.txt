@@ -1,0 +1,38 @@
+# solution/ci/run-control.sh, run on 2026-11-08 in a copy of the lab laid out as an application repository
+# (Linux x86_64, Python 3.13.18); tools installed by the script itself, binaries verified against the pinned sha256.
+# dast was not run: it needs a container runtime with access to ghcr.io and a running service.
+== run-control.sh sast
+adapt: bandit: 0 finding(s), 1 scanned -> evidence/reports/sast.json
+adapt: bandit: 3 finding(s), 1 scanned -> evidence/canaries/sast.json
+target=0
+canary=1
+exit=0
+== run-control.sh sca
+WARNING:pip_audit._cli:--no-deps is supported, but users are encouraged to fully hash their pinned dependencies
+WARNING:pip_audit._cli:Consider using a tool like `pip-compile`: https://pip-tools.readthedocs.io/en/latest/#using-hashes
+No known vulnerabilities found
+WARNING:pip_audit._cli:--no-deps is supported, but users are encouraged to fully hash their pinned dependencies
+WARNING:pip_audit._cli:Consider using a tool like `pip-compile`: https://pip-tools.readthedocs.io/en/latest/#using-hashes
+Found 22 known vulnerabilities in 2 packages
+adapt: pip-audit: 0 finding(s), 3 scanned -> evidence/reports/sca.json
+adapt: pip-audit: 11 finding(s), 2 scanned -> evidence/canaries/sca.json
+target=0
+canary=1
+exit=0
+== run-control.sh secrets
+6:08PM INF 1 commits scanned.
+6:08PM INF scanned ~21547 bytes (21.55 KB) in 192ms
+6:08PM INF no leaks found
+6:08PM INF scanned ~115 bytes (115 bytes) in 11.4ms
+6:08PM WRN leaks found: 2
+adapt: gitleaks: 0 finding(s), 1 scanned -> evidence/reports/secrets.json
+adapt: gitleaks: 2 finding(s), 1 scanned -> evidence/canaries/secrets.json
+target=0
+canary=1
+exit=0
+== run-control.sh iac
+adapt: trivy-config: 1 finding(s), 1 scanned -> evidence/reports/iac.json
+adapt: trivy-config: 7 finding(s), 1 scanned -> evidence/canaries/iac.json
+target=1
+canary=1
+exit=0

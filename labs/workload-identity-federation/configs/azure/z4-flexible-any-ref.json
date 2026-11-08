@@ -1,0 +1,11 @@
+{
+  "description": "Flexible credential: any subject of the repository, pinned by ID.",
+  "issuer": "https://token.actions.githubusercontent.com",
+  "claimsMatchingExpression": {
+    "value": "claims['sub'] matches 'repo:sharetable@51234567/website@712345678:*' and claims['repository_id'] eq '712345678'",
+    "languageVersion": 1
+  },
+  "audiences": [
+    "api://AzureADTokenExchange"
+  ]
+}

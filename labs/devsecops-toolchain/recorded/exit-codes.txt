@@ -1,0 +1,11 @@
+# tool  input  exit-code   (recorded in the lab's recording environment; see README.md)
+bandit target 0
+bandit canary 1
+pip-audit target 0
+pip-audit target-stale-pins 1
+pip-audit canary 1
+gitleaks target 0
+gitleaks canary 1
+trivy-config target 1
+trivy-config canary 1
+bandit parse-error 0

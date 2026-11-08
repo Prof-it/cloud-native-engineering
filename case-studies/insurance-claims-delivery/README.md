@@ -462,7 +462,7 @@ Illustrative, not a recommendation; check current capabilities before relying on
 | Environment approvals, self-review prevented | Environments with required reviewers and "Prevent self-review" | Protected environments with deployment approvals | Environments with approvals and checks |
 | Deployment records | Deployments API | Deployments and environments | Environment deployment history |
 | Provenance signing | Artifact attestations (Sigstore) | Sigstore keyless signing in CI | Notation or Sigstore in pipelines |
-| Federated cloud identity | OIDC with environment subject claims | OIDC ID tokens | Workload identity federation |
+| Federated cloud identity | OIDC with environment subject claims; pin `repository_id` as well, since subjects of repositories created after 15 July 2026 carry immutable IDs (see the [Charity Website case](../charity-site-azure-container-apps/README.md#a5-the-immutable-subject-change)) | OIDC ID tokens | Workload identity federation |
 
 | Logical component | AWS | Microsoft Azure | Google Cloud |
 |---|---|---|---|
@@ -484,4 +484,4 @@ Illustrative, not a recommendation; check current capabilities before relying on
 - [GitHub Docs – Using artifact attestations to establish provenance for builds](https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations/using-artifact-attestations-to-establish-provenance-for-builds)
 - [Laukkanen, Itkonen and Lassenius (2017) – Problems, causes and solutions when adopting continuous delivery](https://doi.org/10.1016/j.infsof.2016.10.001)
 - [Shahin, Ali Babar and Zhu (2017) – Continuous integration, delivery and deployment: a systematic review](https://doi.org/10.1109/ACCESS.2017.2685629)
-- In this repository: [Regulated Card Payments case, A10](../regulated-card-payments/README.md#a10-delivery-pipeline-and-evidence-chain), [Immutable Infrastructure pattern](../../patterns/immutable-infrastructure.md), [Release Promotion Lab](../../labs/release-promotion/README.md)
+- In this repository: [Telehealth security gates case](../telehealth-security-gates/README.md) (what the gate in C4 must look like), [Regulated Card Payments case, A10](../regulated-card-payments/README.md#a10-delivery-pipeline-and-evidence-chain), [Immutable Infrastructure pattern](../../patterns/immutable-infrastructure.md), [Release Promotion Lab](../../labs/release-promotion/README.md)

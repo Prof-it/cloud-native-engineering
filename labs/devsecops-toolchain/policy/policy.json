@@ -1,0 +1,19 @@
+{
+  "required_jobs": ["sast", "sca", "secrets", "iac", "dast"],
+  "controls": {
+    "sast":    {"tool": "bandit",    "version": "1.9.4",  "covers": "python_files",  "block_at": "HIGH",   "canary_expects": ["B602"],
+                "rationale": "Bandit rates shell injection HIGH and hard-coded password strings LOW; LOW and MEDIUM code findings are reviewed in the pull request."},
+    "sca":     {"tool": "pip-audit", "version": "2.10.1", "covers": "packages",      "block_at": "HIGH",   "canary_expects": ["PYSEC-2021-66"],
+                "rationale": "pip-audit gives no severity, so an advisory without a mapped severity counts as HIGH and blocks."},
+    "secrets": {"tool": "gitleaks",  "version": "8.30.1", "covers": "secret_scopes", "block_at": "LOW",    "canary_expects": ["github-pat", "stripe-access-token"],
+                "rationale": "Any detected credential blocks and is rotated; a leaked secret has no acceptable severity."},
+    "iac":     {"tool": "trivy",     "version": "0.76.2", "covers": "iac_files",     "block_at": "HIGH",   "canary_expects": ["AWS-0086"],
+                "rationale": "Misconfigurations at HIGH or above can expose statements data or access."},
+    "dast":    {"tool": "zap",       "version": "2.17.0", "covers": "routes",        "block_at": "MEDIUM", "canary_expects": ["10038"],
+                "rationale": "DAST findings are observed on the running service, so MEDIUM already blocks."}
+  },
+  "exceptions": {"max_days": 90, "max_severity": "HIGH", "approver_team": "security"},
+  "teams": {"security": ["carol", "dave"], "engineering": ["alice", "bob", "erin"]},
+  "code_owners_team": "security",
+  "protected_paths": [".github/workflows/", "gate/", "adapters/", "policy/", "exceptions/", ".github/CODEOWNERS"]
+}

@@ -1,0 +1,10 @@
+# Copy to .github/CODEOWNERS. Replace @your-org/security with a team of at least two people.
+# With "Require review from Code Owners" enabled on main, a change to any of these paths
+# cannot be merged without approval from the security team, and the platform, not the
+# workflow under change, enforces it.
+/.github/workflows/   @your-org/security
+/.github/CODEOWNERS   @your-org/security
+/gate/                @your-org/security
+/policy/              @your-org/security
+/exceptions/          @your-org/security
+/ci/run-control.sh    @your-org/security

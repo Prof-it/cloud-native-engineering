@@ -100,6 +100,12 @@ AI introduces new concerns including model integrity, prompt-surface risks, data
 - [Reliability Engineering](./11-reliability.md)
 - [Infrastructure as Code Pattern](../patterns/infrastructure-as-code.md)
 - [Observability](./09-observability.md)
+- [Case: Telehealth Appointment Platform, Risk-Based Security Gates](../case-studies/telehealth-security-gates/README.md)
+- [Security Gates Lab](../labs/security-gates/README.md)
+- [Case: Retail Bank Account-Summary API, Assessing the DevSecOps Tool Set](../case-studies/retail-bank-devsecops-toolchain/README.md)
+- [DevSecOps Toolchain Lab](../labs/devsecops-toolchain/README.md)
+- [Case: Charity Website on Azure Container Apps, Platform Bootstrap and Workload Identity](../case-studies/charity-site-azure-container-apps/README.md)
+- [Workload Identity Federation Lab](../labs/workload-identity-federation/README.md)
 
 ## Further Reading
 

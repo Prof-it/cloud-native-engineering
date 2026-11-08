@@ -1,0 +1,19 @@
+{
+  "name": "t6-other-repo-same-owner",
+  "description": "Another repository of the same owner (preview site)",
+  "claims": {
+    "iss": "https://token.actions.githubusercontent.com",
+    "sub": "repo:sharetable@51234567/website-preview@712345999:ref:refs/heads/main",
+    "repository": "sharetable/website-preview",
+    "repository_id": "712345999",
+    "repository_owner": "sharetable",
+    "repository_owner_id": "51234567",
+    "ref": "refs/heads/main",
+    "event_name": "push",
+    "job_workflow_ref": "sharetable/website-preview/.github/workflows/deploy.yml@refs/heads/main",
+    "workflow": "deploy",
+    "actor": "maintainer-a",
+    "actor_id": "61000001",
+    "runner_environment": "github-hosted"
+  }
+}

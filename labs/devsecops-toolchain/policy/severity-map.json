@@ -1,0 +1,4 @@
+{
+  "_comment": "Advisory id -> severity, taken from the advisory database by the security team. Lab data: ids not listed here fall back to --unknown-severity (HIGH).",
+  "PYSEC-2026-2151": "MEDIUM"
+}

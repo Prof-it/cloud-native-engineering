@@ -1,0 +1,10 @@
+{
+  "description": "IDs plus main branch, or IDs plus the production environment.",
+  "name": "projects/123456789012/locations/global/workloadIdentityPools/github/providers/github",
+  "issuer_uri": "https://token.actions.githubusercontent.com",
+  "attribute_mapping": {
+    "google.subject": "assertion.sub",
+    "attribute.repository_id": "assertion.repository_id"
+  },
+  "attribute_condition": "assertion.repository_owner_id == '51234567' && assertion.repository_id == '712345678' && assertion.ref == 'refs/heads/main' || assertion.repository_owner_id == '51234567' && assertion.repository_id == '712345678' && assertion.environment == 'production'"
+}

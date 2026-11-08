@@ -1,0 +1,19 @@
+{
+  "name": "t10-pull-request-legacy",
+  "description": "Pull request from a branch of the same repository, before the repository moved to immutable subjects",
+  "claims": {
+    "iss": "https://token.actions.githubusercontent.com",
+    "sub": "repo:sharetable/website:pull_request",
+    "repository": "sharetable/website",
+    "repository_id": "712345678",
+    "repository_owner": "sharetable",
+    "repository_owner_id": "51234567",
+    "ref": "refs/pull/7/merge",
+    "event_name": "pull_request",
+    "job_workflow_ref": "sharetable/website/.github/workflows/deploy.yml@refs/pull/7/merge",
+    "workflow": "deploy",
+    "actor": "maintainer-a",
+    "actor_id": "61000001",
+    "runner_environment": "github-hosted"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "@version": "2.17.0",
+  "@generated": "Sun, 8 Nov 2026 17:00:00",
+  "created": "2026-11-08T17:00:00.000+00:00",
+  "site": [
+    {
+      "@name": "http://summary.lab.invalid:8080",
+      "@host": "summary.lab.invalid",
+      "@port": "8080",
+      "@ssl": "false",
+      "alerts": [
+        {
+          "pluginid": "10038",
+          "alertRef": "10038",
+          "alert": "Content Security Policy (CSP) Header Not Set",
+          "name": "Content Security Policy (CSP) Header Not Set",
+          "riskcode": "2",
+          "confidence": "3",
+          "riskdesc": "Medium (High)",
+          "instances": [
+            {
+              "uri": "http://summary.lab.invalid:8080/canary/no-csp",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": ""
+            }
+          ],
+          "count": "1",
+          "cweid": "693",
+          "wascid": "15"
+        }
+      ]
+    }
+  ]
+}

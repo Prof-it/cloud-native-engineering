@@ -1,0 +1,42 @@
+[
+ {
+  "RuleID": "stripe-access-token",
+  "Description": "Found a Stripe Access Token, posing a risk to payment processing services and sensitive financial data.",
+  "StartLine": 2,
+  "EndLine": 2,
+  "StartColumn": 14,
+  "EndColumn": 61,
+  "Match": "REDACTED",
+  "Secret": "REDACTED",
+  "File": "canaries/secrets/settings.env",
+  "SymlinkFile": "",
+  "Commit": "",
+  "Entropy": 5.194236,
+  "Author": "",
+  "Email": "",
+  "Date": "",
+  "Message": "",
+  "Tags": [],
+  "Fingerprint": "canaries/secrets/settings.env:stripe-access-token:2"
+ },
+ {
+  "RuleID": "github-pat",
+  "Description": "Uncovered a GitHub Personal Access Token, potentially leading to unauthorized repository access and sensitive content exposure.",
+  "StartLine": 1,
+  "EndLine": 1,
+  "StartColumn": 14,
+  "EndColumn": 53,
+  "Match": "REDACTED",
+  "Secret": "REDACTED",
+  "File": "canaries/secrets/settings.env",
+  "SymlinkFile": "",
+  "Commit": "",
+  "Entropy": 4.703056,
+  "Author": "",
+  "Email": "",
+  "Date": "",
+  "Message": "",
+  "Tags": [],
+  "Fingerprint": "canaries/secrets/settings.env:github-pat:1"
+ }
+]

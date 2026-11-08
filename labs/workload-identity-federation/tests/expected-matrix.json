@@ -1,0 +1,149 @@
+{
+  "note": "Expected decisions, derived from the documented matching rules (see solution/federation.py docstring) and reviewed by hand.",
+  "rows": {
+    "aws/a1-name-exact-main": {
+      "t1-main-legacy": "allow",
+      "t10-pull-request-legacy": "deny",
+      "t2-main-immutable": "deny",
+      "t3-production-environment": "deny",
+      "t4-pull-request": "deny",
+      "t5-feature-branch": "deny",
+      "t6-other-repo-same-owner": "deny",
+      "t7-name-takeover": "deny",
+      "t8-wrong-audience": "deny",
+      "t9-foreign-issuer": "deny"
+    },
+    "aws/a2-name-wildcard": {
+      "t1-main-legacy": "allow",
+      "t10-pull-request-legacy": "allow",
+      "t2-main-immutable": "deny",
+      "t3-production-environment": "deny",
+      "t4-pull-request": "deny",
+      "t5-feature-branch": "deny",
+      "t6-other-repo-same-owner": "deny",
+      "t7-name-takeover": "deny",
+      "t8-wrong-audience": "deny",
+      "t9-foreign-issuer": "deny"
+    },
+    "aws/a3-both-formats-wildcard": {
+      "t1-main-legacy": "allow",
+      "t10-pull-request-legacy": "allow",
+      "t2-main-immutable": "allow",
+      "t3-production-environment": "allow",
+      "t4-pull-request": "allow",
+      "t5-feature-branch": "allow",
+      "t6-other-repo-same-owner": "deny",
+      "t7-name-takeover": "allow",
+      "t8-wrong-audience": "deny",
+      "t9-foreign-issuer": "deny"
+    },
+    "aws/a4-no-sub": {
+      "t1-main-legacy": "invalid",
+      "t10-pull-request-legacy": "invalid",
+      "t2-main-immutable": "invalid",
+      "t3-production-environment": "invalid",
+      "t4-pull-request": "invalid",
+      "t5-feature-branch": "invalid",
+      "t6-other-repo-same-owner": "invalid",
+      "t7-name-takeover": "invalid",
+      "t8-wrong-audience": "invalid",
+      "t9-foreign-issuer": "invalid"
+    },
+    "azure/z1-legacy-subject-main": {
+      "t1-main-legacy": "allow",
+      "t10-pull-request-legacy": "deny",
+      "t2-main-immutable": "deny",
+      "t3-production-environment": "deny",
+      "t4-pull-request": "deny",
+      "t5-feature-branch": "deny",
+      "t6-other-repo-same-owner": "deny",
+      "t7-name-takeover": "deny",
+      "t8-wrong-audience": "deny",
+      "t9-foreign-issuer": "deny"
+    },
+    "azure/z2-immutable-subject-main": {
+      "t1-main-legacy": "deny",
+      "t10-pull-request-legacy": "deny",
+      "t2-main-immutable": "allow",
+      "t3-production-environment": "deny",
+      "t4-pull-request": "deny",
+      "t5-feature-branch": "deny",
+      "t6-other-repo-same-owner": "deny",
+      "t7-name-takeover": "deny",
+      "t8-wrong-audience": "deny",
+      "t9-foreign-issuer": "deny"
+    },
+    "azure/z3-lowercase-subject": {
+      "t1-main-legacy": "deny",
+      "t10-pull-request-legacy": "deny",
+      "t2-main-immutable": "deny",
+      "t3-production-environment": "deny",
+      "t4-pull-request": "deny",
+      "t5-feature-branch": "deny",
+      "t6-other-repo-same-owner": "deny",
+      "t7-name-takeover": "deny",
+      "t8-wrong-audience": "deny",
+      "t9-foreign-issuer": "deny"
+    },
+    "azure/z4-flexible-any-ref": {
+      "t1-main-legacy": "deny",
+      "t10-pull-request-legacy": "deny",
+      "t2-main-immutable": "allow",
+      "t3-production-environment": "allow",
+      "t4-pull-request": "allow",
+      "t5-feature-branch": "allow",
+      "t6-other-repo-same-owner": "deny",
+      "t7-name-takeover": "deny",
+      "t8-wrong-audience": "deny",
+      "t9-foreign-issuer": "deny"
+    },
+    "gcp/g1-owner-name": {
+      "t1-main-legacy": "allow",
+      "t10-pull-request-legacy": "allow",
+      "t2-main-immutable": "allow",
+      "t3-production-environment": "allow",
+      "t4-pull-request": "allow",
+      "t5-feature-branch": "allow",
+      "t6-other-repo-same-owner": "allow",
+      "t7-name-takeover": "allow",
+      "t8-wrong-audience": "deny",
+      "t9-foreign-issuer": "deny"
+    },
+    "gcp/g2-repository-name-main": {
+      "t1-main-legacy": "allow",
+      "t10-pull-request-legacy": "deny",
+      "t2-main-immutable": "allow",
+      "t3-production-environment": "allow",
+      "t4-pull-request": "deny",
+      "t5-feature-branch": "deny",
+      "t6-other-repo-same-owner": "deny",
+      "t7-name-takeover": "allow",
+      "t8-wrong-audience": "deny",
+      "t9-foreign-issuer": "deny"
+    },
+    "gcp/g3-ids-main-or-production": {
+      "t1-main-legacy": "allow",
+      "t10-pull-request-legacy": "deny",
+      "t2-main-immutable": "allow",
+      "t3-production-environment": "allow",
+      "t4-pull-request": "deny",
+      "t5-feature-branch": "deny",
+      "t6-other-repo-same-owner": "deny",
+      "t7-name-takeover": "deny",
+      "t8-wrong-audience": "deny",
+      "t9-foreign-issuer": "deny"
+    },
+    "gcp/g4-no-condition": {
+      "t1-main-legacy": "invalid",
+      "t10-pull-request-legacy": "invalid",
+      "t2-main-immutable": "invalid",
+      "t3-production-environment": "invalid",
+      "t4-pull-request": "invalid",
+      "t5-feature-branch": "invalid",
+      "t6-other-repo-same-owner": "invalid",
+      "t7-name-takeover": "invalid",
+      "t8-wrong-audience": "invalid",
+      "t9-foreign-issuer": "invalid"
+    }
+  }
+}

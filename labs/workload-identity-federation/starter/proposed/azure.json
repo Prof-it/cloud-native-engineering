@@ -1,0 +1,13 @@
+{
+  "description": "Your proposal. Starts as the report's original credential; replace it.",
+  "credentials": [
+    {
+      "issuer": "https://token.actions.githubusercontent.com",
+      "subject": "repo:sharetable/website:ref:refs/heads/main",
+      "audiences": [
+        "api://AzureADTokenExchange"
+      ],
+      "name": "main-legacy"
+    }
+  ]
+}

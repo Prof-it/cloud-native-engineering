@@ -137,4 +137,4 @@ This removes `.work/` and the generated files in `artifacts/`.
 
 ---
 
-**Previous Lab:** [labs/security/README.md](../security/README.md)
+**Previous Lab:** [labs/security/README.md](../security/README.md) · **Next Lab:** [labs/security-gates/README.md](../security-gates/README.md)

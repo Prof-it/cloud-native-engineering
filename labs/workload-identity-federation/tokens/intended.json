@@ -1,0 +1,8 @@
+{
+  "description": "Who may deploy the sharetable/website production site: main-branch pushes and the production environment of THIS repository, in either subject format during migration. Nothing else.",
+  "allow": [
+    "t1-main-legacy",
+    "t2-main-immutable",
+    "t3-production-environment"
+  ]
+}

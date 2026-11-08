@@ -1,0 +1,10 @@
+{
+  "description": "Repository and branch by name.",
+  "name": "projects/123456789012/locations/global/workloadIdentityPools/github/providers/github",
+  "issuer_uri": "https://token.actions.githubusercontent.com",
+  "attribute_mapping": {
+    "google.subject": "assertion.sub",
+    "attribute.repository_id": "assertion.repository_id"
+  },
+  "attribute_condition": "assertion.repository == 'sharetable/website' && assertion.ref == 'refs/heads/main'"
+}

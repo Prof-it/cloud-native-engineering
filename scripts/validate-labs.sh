@@ -5,7 +5,7 @@ ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 LABS_DIR="$ROOT_DIR/labs"
 # Every subdirectory of labs/ is a lab; new labs are picked up without editing this file.
 # Order: the recommended progression first, then any further labs alphabetically.
-PREFERRED_ORDER=(docker kubernetes terraform gitops observability networking security release-promotion)
+PREFERRED_ORDER=(docker kubernetes terraform gitops observability networking security release-promotion security-gates devsecops-toolchain workload-identity-federation)
 LAB_NAMES=()
 for lab in "${PREFERRED_ORDER[@]}"; do
   [[ -d "$LABS_DIR/$lab" ]] && LAB_NAMES+=("$lab")

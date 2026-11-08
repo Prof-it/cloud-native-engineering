@@ -1,0 +1,57 @@
+{
+  "@version": "2.17.0",
+  "@generated": "Sun, 8 Nov 2026 17:00:00",
+  "created": "2026-11-08T17:00:00.000+00:00",
+  "site": [
+    {
+      "@name": "http://summary.lab.invalid:8080",
+      "@host": "summary.lab.invalid",
+      "@port": "8080",
+      "@ssl": "false",
+      "alerts": [
+        {
+          "pluginid": "10021",
+          "alertRef": "10021",
+          "alert": "X-Content-Type-Options Header Missing",
+          "name": "X-Content-Type-Options Header Missing",
+          "riskcode": "1",
+          "confidence": "2",
+          "riskdesc": "Low (Medium)",
+          "instances": [
+            {
+              "uri": "http://summary.lab.invalid:8080/health",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": ""
+            }
+          ],
+          "count": "1",
+          "cweid": "693",
+          "wascid": "15"
+        },
+        {
+          "pluginid": "10049",
+          "alertRef": "10049",
+          "alert": "Storable and Cacheable Content",
+          "name": "Storable and Cacheable Content",
+          "riskcode": "0",
+          "confidence": "2",
+          "riskdesc": "Informational (Medium)",
+          "instances": [
+            {
+              "uri": "http://summary.lab.invalid:8080/health",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": ""
+            }
+          ],
+          "count": "1",
+          "cweid": "524",
+          "wascid": "13"
+        }
+      ]
+    }
+  ]
+}

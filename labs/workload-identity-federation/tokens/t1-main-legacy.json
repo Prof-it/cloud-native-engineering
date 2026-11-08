@@ -1,0 +1,19 @@
+{
+  "name": "t1-main-legacy",
+  "description": "Push to main, repository not yet opted in to immutable subjects (name-based sub)",
+  "claims": {
+    "iss": "https://token.actions.githubusercontent.com",
+    "sub": "repo:sharetable/website:ref:refs/heads/main",
+    "repository": "sharetable/website",
+    "repository_id": "712345678",
+    "repository_owner": "sharetable",
+    "repository_owner_id": "51234567",
+    "ref": "refs/heads/main",
+    "event_name": "push",
+    "job_workflow_ref": "sharetable/website/.github/workflows/deploy.yml@refs/heads/main",
+    "workflow": "deploy",
+    "actor": "maintainer-a",
+    "actor_id": "61000001",
+    "runner_environment": "github-hosted"
+  }
+}

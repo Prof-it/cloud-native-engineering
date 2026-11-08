@@ -1,0 +1,35 @@
+{
+  "description": "One identity, three credentials. The name-based one exists only until the repository opts in to immutable subjects, then it is deleted.",
+  "credentials": [
+    {
+      "name": "main-legacy-until-opt-in",
+      "issuer": "https://token.actions.githubusercontent.com",
+      "subject": "repo:sharetable/website:ref:refs/heads/main",
+      "audiences": [
+        "api://AzureADTokenExchange"
+      ]
+    },
+    {
+      "name": "main-immutable",
+      "issuer": "https://token.actions.githubusercontent.com",
+      "claimsMatchingExpression": {
+        "value": "claims['sub'] eq 'repo:sharetable@51234567/website@712345678:ref:refs/heads/main' and claims['repository_id'] eq '712345678' and claims['repository_owner_id'] eq '51234567'",
+        "languageVersion": 1
+      },
+      "audiences": [
+        "api://AzureADTokenExchange"
+      ]
+    },
+    {
+      "name": "production-immutable",
+      "issuer": "https://token.actions.githubusercontent.com",
+      "claimsMatchingExpression": {
+        "value": "claims['sub'] eq 'repo:sharetable@51234567/website@712345678:environment:production' and claims['repository_id'] eq '712345678' and claims['repository_owner_id'] eq '51234567'",
+        "languageVersion": 1
+      },
+      "audiences": [
+        "api://AzureADTokenExchange"
+      ]
+    }
+  ]
+}

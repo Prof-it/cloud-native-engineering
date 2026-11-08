@@ -21,6 +21,9 @@ Labs are grouped by capability, not by session. Each capability folder contains 
 6. **networking** – Service connectivity and security
 7. **security** – Securing cloud-native workloads
 8. **release-promotion** – Build once, promote many: evidence, approvals, ordering and rollback across DEV, UAT and PROD
+9. **security-gates** – Fail-closed security gates, negative controls, bounded exceptions, gate protection and detection rules as code
+10. **devsecops-toolchain** – Assessing real scanners (Bandit, pip-audit, Gitleaks, Trivy, ZAP) by measured behaviour and turning their reports into fail-closed gate evidence
+11. **workload-identity-federation** – OIDC trust rules of AWS, Azure and Google Cloud evaluated offline: immutable IDs, the subject format change, name takeover, and bootstrap versus deployment
 
 Each lab README follows a standard structure:
 - Objective
@@ -59,7 +62,7 @@ Execution contract for every lab:
 - A working Docker installation
 - Access to a Kubernetes cluster (local or cloud)
 - Terraform CLI
-- Python 3.9+ and OpenSSL (release-promotion lab)
+- Python 3.9+ and OpenSSL (release-promotion lab); Python 3.9+ (security-gates and devsecops-toolchain labs; the latter optionally Bandit, pip-audit, Gitleaks, Trivy and OpenTofu for live mode); Python 3.9+ (workload-identity-federation lab, no cloud account needed)
 - Git and a GitHub account
 - Basic command-line proficiency
 

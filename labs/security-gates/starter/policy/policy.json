@@ -1,0 +1,23 @@
+{
+  "required_jobs": ["tests", "sast", "sca", "secrets", "container", "iac", "dast", "detection"],
+  "controls": {
+    "sast":      {"tool": "bandit",   "version": "1.8.6",  "covers": "python_files", "block_at": "HIGH",   "canary_expects": ["B602"],
+                  "rationale": "Code findings below HIGH are reviewed in the pull request, not blocked."},
+    "sca":       {"tool": "pip-audit", "version": "2.9.0", "covers": "packages",     "block_at": "HIGH",   "canary_expects": ["CVE-LAB-0001"],
+                  "rationale": "Known vulnerable dependencies at HIGH or above block; lower ones are tracked."},
+    "secrets":   {"tool": "gitleaks", "version": "8.28.0", "block_at": "LOW",        "canary_expects": ["generic-api-key"],
+                  "rationale": "Any detected secret blocks: a leaked credential has no acceptable severity."},
+    "container": {"tool": "trivy",    "version": "0.67.0", "covers": "image_packages", "block_at": "HIGH", "canary_expects": ["CVE-LAB-0002"],
+                  "rationale": "Same threshold as dependencies: the image is a dependency set."},
+    "iac":       {"tool": "trivy",    "version": "0.67.0", "covers": "iac_files",    "block_at": "HIGH",   "canary_expects": ["LAB-S3-PUBLIC"],
+                  "rationale": "Misconfigurations at HIGH or above expose data or access."},
+    "dast":      {"tool": "zap",      "version": "2.17.0", "covers": "routes",       "block_at": "MEDIUM", "canary_expects": ["LAB-CORS-WILDCARD"],
+                  "rationale": "DAST findings are observed on the running service, so MEDIUM already blocks."},
+    "detection": {"tool": "detect",   "version": "1.0.0",  "block_at": "MEDIUM",     "canary_expects": ["AUTH_FAILURE_BURST_CLIENT"],
+                  "rationale": "Normal traffic must raise no alert; any alert on the normal log is a false positive or a contract breach."}
+  },
+  "exceptions": {"max_days": 90, "max_severity": "HIGH", "approver_team": "security"},
+  "teams": {"security": ["carol", "dave"], "engineering": ["alice", "bob", "erin"]},
+  "code_owners_team": "security",
+  "protected_paths": [".github/workflows/", "gate/", "policy/", "exceptions/", ".github/CODEOWNERS"]
+}

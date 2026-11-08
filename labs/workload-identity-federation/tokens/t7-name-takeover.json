@@ -1,0 +1,19 @@
+{
+  "name": "t7-name-takeover",
+  "description": "Owner account renamed or deleted; someone else registers the old owner name and creates a repository with the old name. Same names, new IDs",
+  "claims": {
+    "iss": "https://token.actions.githubusercontent.com",
+    "sub": "repo:sharetable@99887766/website@800000001:ref:refs/heads/main",
+    "repository": "sharetable/website",
+    "repository_id": "800000001",
+    "repository_owner": "sharetable",
+    "repository_owner_id": "99887766",
+    "ref": "refs/heads/main",
+    "event_name": "push",
+    "job_workflow_ref": "sharetable/website/.github/workflows/deploy.yml@refs/heads/main",
+    "workflow": "deploy",
+    "actor": "maintainer-a",
+    "actor_id": "61000001",
+    "runner_environment": "github-hosted"
+  }
+}

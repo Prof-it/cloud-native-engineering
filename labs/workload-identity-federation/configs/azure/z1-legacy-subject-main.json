@@ -1,0 +1,8 @@
+{
+  "description": "The credential first created in the report: name-based subject for main.",
+  "issuer": "https://token.actions.githubusercontent.com",
+  "subject": "repo:sharetable/website:ref:refs/heads/main",
+  "audiences": [
+    "api://AzureADTokenExchange"
+  ]
+}
