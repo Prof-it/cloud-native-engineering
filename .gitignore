@@ -1,2 +1,4 @@
 # Private agent runbooks and execution artifacts
 .runbook/
+labs/gitlab-pipeline-gates/tests/__pycache__/*
+labs/gitlab-pipeline-gates/tools/__pycache__/*
