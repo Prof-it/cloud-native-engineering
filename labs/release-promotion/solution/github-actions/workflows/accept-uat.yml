@@ -1,0 +1,37 @@
+# Business acceptance after testing in UAT, recorded by the platform.
+# The `uat-acceptance` environment has required reviewers from the business and
+# "Prevent self-review" enabled; approving this job is the acceptance decision.
+name: Accept release in UAT
+
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: Full commit SHA of the release tested in UAT
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  accept:
+    runs-on: ubuntu-latest
+    environment: uat-acceptance
+    env:
+      RELEASE: ${{ inputs.sha }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.sha }}
+      - name: Record acceptance of the release that actually ran in UAT
+        run: |
+          read -r sha digest _ < <(./ci/release-records.sh last uat)
+          if [[ "$sha" != "$RELEASE" ]]; then
+            echo "UAT runs ${sha:-nothing}, not ${RELEASE}; acceptance refused." >&2
+            exit 1
+          fi
+          id="$(./ci/release-records.sh start uat "$RELEASE" "$digest" acceptance)"
+          ./ci/release-records.sh finish "$id" success

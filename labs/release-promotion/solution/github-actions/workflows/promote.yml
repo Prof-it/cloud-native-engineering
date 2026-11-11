@@ -1,0 +1,136 @@
+# Promote an unchanged release to UAT or PROD.
+# Engineers start it; business reviewers approve it through the environment's protection rules.
+name: Promote release
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Target environment
+        required: true
+        type: choice
+        options: [uat, prod]
+      sha:
+        description: Full 40-character commit SHA of the release
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: promote-${{ inputs.target }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: read
+      packages: read
+      attestations: read
+    env:
+      RELEASE: ${{ inputs.sha }}
+      TARGET: ${{ inputs.target }}
+      PREVIOUS: ${{ inputs.target == 'prod' && 'uat' || 'dev' }}
+      GH_TOKEN: ${{ github.token }}
+    outputs:
+      digest: ${{ steps.evidence.outputs.digest }}
+      workflow_blob: ${{ steps.evidence.outputs.workflow_blob }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.workflow_sha }}
+          fetch-depth: 0
+      - name: Image name
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}/app" >> "$GITHUB_ENV"
+      - name: Check the evidence chain
+        id: evidence
+        run: |
+          [[ "$RELEASE" =~ ^[0-9a-f]{40}$ ]] || { echo "Give the full commit SHA." >&2; exit 1; }
+          git merge-base --is-ancestor "$RELEASE" origin/main || { echo "Release is not on main." >&2; exit 1; }
+          blob="$(git rev-parse "${{ github.workflow_sha }}:.github/workflows/promote.yml")"
+
+          # Same artefact that succeeded one stage earlier.
+          read -r _ digest prev_blob < <(./ci/release-records.sh get "$PREVIOUS" "$RELEASE") || true
+          [[ -n "${digest:-}" ]] || { echo "No successful ${PREVIOUS} deployment of ${RELEASE}." >&2; exit 1; }
+
+          # Same promotion logic that carried the release through the previous stage (UAT -> PROD).
+          if [[ "$TARGET" == "prod" && "$prev_blob" != "$blob" ]]; then
+            echo "promote.yml changed since UAT (${prev_blob} -> ${blob}); promote the release through UAT again." >&2
+            exit 1
+          fi
+
+          # PROD also needs recorded business acceptance in UAT.
+          if [[ "$TARGET" == "prod" ]]; then
+            ./ci/release-records.sh find uat "$RELEASE" "$digest" acceptance \
+              || { echo "No business acceptance of ${RELEASE} in UAT." >&2; exit 1; }
+          fi
+
+          # Never move the target backwards; a rollback is its own, reviewed workflow.
+          running="$(./ci/release-records.sh last "$TARGET" | cut -d' ' -f1)"
+          if [[ -n "$running" ]] && git merge-base --is-ancestor "$RELEASE" "$running"; then
+            echo "${TARGET} runs ${running}, which already contains ${RELEASE}." >&2
+            exit 1
+          fi
+
+          echo "digest=${digest}" >> "$GITHUB_OUTPUT"
+          echo "workflow_blob=${blob}" >> "$GITHUB_OUTPUT"
+      - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Verify provenance of the exact digest
+        run: |
+          gh attestation verify "oci://${IMAGE}@${{ steps.evidence.outputs.digest }}" --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "${GITHUB_REPOSITORY}/.github/workflows/ci.yml" --source-digest "$RELEASE"
+
+  deploy:
+    needs: check
+    runs-on: ubuntu-latest
+    # Required reviewers (business) and "Prevent self-review" are configured on the
+    # uat and prod environments; the job waits here until someone else approves.
+    environment: ${{ inputs.target }}
+    permissions:
+      contents: read
+      actions: read        # read who approved this run
+      deployments: write
+      id-token: write      # short-lived cloud credentials scoped to the target environment
+    env:
+      RELEASE: ${{ inputs.sha }}
+      TARGET: ${{ inputs.target }}
+      DIGEST: ${{ needs.check.outputs.digest }}
+      WORKFLOW_BLOB: ${{ needs.check.outputs.workflow_blob }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.sha }}
+      - name: Image name
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}/app" >> "$GITHUB_ENV"
+      # Prevent self-review blocks the person who started the run. The commit author
+      # is a second conflict the platform does not check, so check it here.
+      - name: Approver is neither the initiator nor the commit author
+        run: |
+          author="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${RELEASE}" --jq '.author.login // ""')"
+          approvers="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/approvals" \
+                        --jq '[.[] | select(.state == "approved") | .user.login] | unique | .[]')"
+          [[ -n "$approvers" ]] || { echo "No recorded approval." >&2; exit 1; }
+          for who in $approvers; do
+            if [[ "$who" == "$GITHUB_TRIGGERING_ACTOR" || "$who" == "$author" ]]; then
+              echo "${who} started or wrote this change and cannot approve it." >&2
+              exit 1
+            fi
+          done
+          echo "Approved by: ${approvers//$'\n'/, }" >> "$GITHUB_STEP_SUMMARY"
+      - name: Deploy the unchanged image, migrate and smoke-test
+        run: |
+          id="$(./ci/release-records.sh start "$TARGET" "$RELEASE" "$DIGEST")"
+          if ./deploy/deploy.sh "$TARGET" "${IMAGE}@${DIGEST}" "$RELEASE"; then
+            ./ci/release-records.sh finish "$id" success
+          else
+            ./ci/release-records.sh finish "$id" failure
+            exit 1
+          fi

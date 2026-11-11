@@ -92,6 +92,8 @@ AI-assisted development accelerates delivery but also increases the need for con
 - [Canary Deployment Pattern](../patterns/canary-deployment.md)
 - [GitOps Pattern](../patterns/gitops.md)
 - [Platform Engineering](./12-platform-engineering.md)
+- [Case: Insurance Claims Portal, Traceable Release Promotion](../case-studies/insurance-claims-delivery/README.md)
+- [Release Promotion Lab](../labs/release-promotion/README.md)
 
 ## Further Reading
 

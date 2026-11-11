@@ -1,4 +1,4 @@
-#\!/usr/bin/env bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 LAB_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -8,7 +8,7 @@ RUN_REPORT="$ARTIFACTS_DIR/run-report.txt"
 RENDER_FILE="$ARTIFACTS_DIR/solution-rendered.yaml"
 
 for req in starter solution tests scripts artifacts; do
-  if [ \! -d "$LAB_ROOT/$req" ]; then
+  if [ ! -d "$LAB_ROOT/$req" ]; then
     echo "missing directory: $req" >&2
     exit 1
   fi
@@ -21,14 +21,14 @@ for req in starter solution tests; do
   fi
 done
 
-if [ \! -f "$RUN_REPORT" ]; then
+if [ ! -f "$RUN_REPORT" ]; then
   echo "run report missing: $RUN_REPORT" >&2
   exit 1
 fi
 
 STATUS="verified-structure"
 if grep -q '^mode: runtime' "$RUN_REPORT"; then
-  if [ \! -s "$RENDER_FILE" ]; then
+  if [ ! -s "$RENDER_FILE" ]; then
     echo "expected rendered manifest output" >&2
     exit 1
   fi

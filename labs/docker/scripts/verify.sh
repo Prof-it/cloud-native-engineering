@@ -1,4 +1,4 @@
-#\!/usr/bin/env bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 LAB_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -8,7 +8,7 @@ RUN_REPORT="$ARTIFACTS_DIR/run-report.txt"
 CONTAINER_FILE="$ARTIFACTS_DIR/container-name.txt"
 
 for req in starter solution tests scripts artifacts; do
-  if [ \! -d "$LAB_ROOT/$req" ]; then
+  if [ ! -d "$LAB_ROOT/$req" ]; then
     echo "missing directory: $req" >&2
     exit 1
   fi
@@ -21,7 +21,7 @@ for req in starter solution tests; do
   fi
 done
 
-if [ \! -f "$RUN_REPORT" ]; then
+if [ ! -f "$RUN_REPORT" ]; then
   echo "run report missing: $RUN_REPORT" >&2
   exit 1
 fi
@@ -30,7 +30,7 @@ STATUS="verified-structure"
 if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1 && [ -f "$CONTAINER_FILE" ]; then
   CONTAINER_NAME="$(cat "$CONTAINER_FILE")"
   RUNNING="$(docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null || true)"
-  if [ "$RUNNING" \!= "true" ]; then
+  if [ "$RUNNING" != "true" ]; then
     echo "expected runtime container to be running" >&2
     exit 1
   fi

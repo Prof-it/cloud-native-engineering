@@ -1,0 +1,79 @@
+# DEV follows main automatically, but never moves backwards.
+name: Deploy DEV
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+  deployments: write
+  packages: read
+  attestations: read
+  id-token: write          # short-lived cloud credentials scoped to the dev environment
+
+# One DEV deployment at a time. A newer queued run replaces an older queued one.
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      RELEASE: ${{ github.event.workflow_run.head_sha }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      # Deployment logic comes from the release itself, not from today's main.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.RELEASE }}
+          fetch-depth: 0
+      - name: Image name
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}/app" >> "$GITHUB_ENV"
+
+      # Ordering rule: skip a release that DEV already runs or has moved past.
+      # Ancestry, not "equals head of main": the head may have failed CI or still be building.
+      - name: Skip releases DEV has moved past
+        id: order
+        run: |
+          running="$(./ci/release-records.sh last dev | cut -d' ' -f1)"
+          if [[ -n "$running" ]] && git merge-base --is-ancestor "$RELEASE" "$running"; then
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+            echo "Skipped: DEV runs ${running}, which already contains ${RELEASE}." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        if: steps.order.outputs.deploy == 'true'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resolve and verify the image built from this commit
+        if: steps.order.outputs.deploy == 'true'
+        run: |
+          digest="$(docker buildx imagetools inspect "${IMAGE}:${RELEASE}" --format '{{json .Manifest}}' | jq -r .digest)"
+          gh attestation verify "oci://${IMAGE}@${digest}" --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "${GITHUB_REPOSITORY}/.github/workflows/ci.yml" --source-digest "$RELEASE"
+          echo "DIGEST=${digest}" >> "$GITHUB_ENV"
+
+      - name: Deploy, migrate and smoke-test
+        if: steps.order.outputs.deploy == 'true'
+        run: |
+          id="$(./ci/release-records.sh start dev "$RELEASE" "$DIGEST")"
+          if ./deploy/deploy.sh dev "${IMAGE}@${DIGEST}" "$RELEASE"; then
+            ./ci/release-records.sh finish "$id" success
+          else
+            ./ci/release-records.sh finish "$id" failure
+            exit 1
+          fi

@@ -84,6 +84,7 @@ AI platforms benefit from immutable infrastructure for reproducible model deploy
 - [patterns/rolling-updates.md](rolling-updates.md)
 - [patterns/stateless-services.md](stateless-services.md)
 - [patterns/infrastructure-as-code.md](infrastructure-as-code.md)
+- [Release Promotion Lab](../labs/release-promotion/README.md): promote one artefact by digest through DEV, UAT and PROD
 
 ## Further Reading
 

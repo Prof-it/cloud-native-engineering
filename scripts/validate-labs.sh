@@ -3,7 +3,25 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 LABS_DIR="$ROOT_DIR/labs"
-LAB_NAMES=(docker kubernetes terraform gitops observability networking security)
+# Every subdirectory of labs/ is a lab; new labs are picked up without editing this file.
+# Order: the recommended progression first, then any further labs alphabetically.
+PREFERRED_ORDER=(docker kubernetes terraform gitops observability networking security release-promotion)
+LAB_NAMES=()
+for lab in "${PREFERRED_ORDER[@]}"; do
+  [[ -d "$LABS_DIR/$lab" ]] && LAB_NAMES+=("$lab")
+done
+while IFS= read -r lab_path; do
+  lab="$(basename "$lab_path")"
+  case " ${LAB_NAMES[*]} " in
+    *" $lab "*) ;;
+    *) LAB_NAMES+=("$lab") ;;
+  esac
+done < <(find "$LABS_DIR" -mindepth 1 -maxdepth 1 -type d | sort)
+for lab in "${PREFERRED_ORDER[@]}"; do
+  if [[ ! -d "$LABS_DIR/$lab" ]]; then
+    LAB_NAMES+=("$lab")  # reported below as "directory missing"
+  fi
+done
 REQUIRED_DIRS=(starter solution tests scripts artifacts)
 REQUIRED_SCRIPTS=(setup.sh run.sh verify.sh test.sh clean.sh)
 PLACEHOLDER_PATTERN='Add .* here|TODO|placeholder'

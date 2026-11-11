@@ -1,4 +1,4 @@
-#\!/usr/bin/env bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 LAB_ROOT="$(cd "$(dirname "$0")/.." && pwd)"

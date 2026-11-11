@@ -91,4 +91,4 @@ You are responsible for securing a Kubernetes-based application. Your tasks incl
 
 ---
 
-**Lab Sequence Complete:** All core labs are now covered. Review the labs in order for a progressive learning experience, and revisit any section for deeper practice.
+**Next Lab:** Proceed to [labs/release-promotion/README.md](../release-promotion/README.md) to carry a release from DEV to PROD with an evidence chain.
