@@ -1,0 +1,8 @@
+.work/
+artifacts/*
+!artifacts/README.md
+solution/live/terraform/.terraform/
+solution/live/terraform/.terraform.lock.hcl
+solution/live/terraform/terraform.tfstate*
+starter/terraform/.terraform/
+**/__pycache__/

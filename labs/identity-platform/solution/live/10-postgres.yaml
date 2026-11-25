@@ -1,0 +1,20 @@
+# Keycloak's database, run by CloudNativePG 1.30. Stand-in for Azure Database
+# for PostgreSQL flexible server in production (zone-redundant HA, CMK).
+# CNPG creates the secret keycloak-db-app (keys username, password) and the
+# read-write service keycloak-db-rw that the Keycloak CR points to.
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: keycloak-db
+  namespace: keycloak
+spec:
+  instances: 2
+  storage:
+    size: 1Gi
+  bootstrap:
+    initdb:
+      database: keycloak
+      owner: keycloak
+  affinity:
+    enablePodAntiAffinity: true
+    topologyKey: kubernetes.io/hostname

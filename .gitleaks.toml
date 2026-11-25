@@ -1,0 +1,10 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Deliberate test material in labs"
+paths = [
+  '''^labs/identity-platform/tests/fixtures/keys/[a-z0-9-]+\.json$''',
+  '''^labs/identity-platform/tests/fixtures/plan-flawed\.json$''',
+  '''^labs/identity-platform/starter/terraform/platform\.tf$''',
+]

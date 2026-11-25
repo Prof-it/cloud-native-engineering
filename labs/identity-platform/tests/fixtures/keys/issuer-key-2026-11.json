@@ -1,0 +1,9 @@
+{
+  "_comment": "TEST KEY for the lab only. Generated for this repository, never used anywhere else. Not a secret.",
+  "kid": "platform-2026-11",
+  "kty": "RSA",
+  "alg": "RS256",
+  "n": "sK9q3lXuQuOp1xUUcWLeQKKoJulMlh10W6_t3I0weIeljULxQQeB0wsoN3kA19ZqIVMw1aXvEkpskDndc_xaVn-UYVgrRi37c3EtBLn6XxepoU4UPWsJ7NCEGyOBqLivp2L771GL8W23rVhnoCraOivFcjDVCjhB-nUpB-j5bPE5xyGkjlDrgMXlQsDLaiHw75j5PsrY6a-pPhr4tfcN43aCo17DMsw0eGzAQpet5vwVht63PBNiwMNDjYp6ah_43nVNkc4BITRX4NdUPbB7oBeJm5SNttnD12yyoVtW2hV1YQEVTdbApMSPHSWxUw08lVq1Ibxkw0ipLky4kHtwyw",
+  "e": "AQAB",
+  "d": "KxEPDRPICFDi-LTAL2UohHvBXf629s5GKwUmhwB5RJ_XyCd9k9rHF9Cb5G2fuXyfkPDssd8I953heYRJSPjFclkVq2ao4anapUh8by7_6sbjR5i3EUNyf2FSGiVc-OnPkw7rFun7IQWb5Gpsk9tuJwi9T3i8rQmKd4iwUCfHCHkaX4qiXyaKDtyM-nhdywPDt7ppOoNxG09xRcmKc1ZL9KE4V-8MzTNAfLSBpAVIa0e1sR4PwxKuEwhUKtqGPQ2KHFlW8vPAUgxwY-y9MvlpHgpH6a0BANPUUYxstTy91inB7qwmF8_x455pulxETEIUQy-ROHN1SyWhMbVVFJJ3gQ"
+}

@@ -2,3 +2,4 @@
 .runbook/
 labs/gitlab-pipeline-gates/tests/__pycache__/*
 labs/gitlab-pipeline-gates/tools/__pycache__/*
+.DS_Store

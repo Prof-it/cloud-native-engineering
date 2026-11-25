@@ -1,0 +1,56 @@
+# Keycloak 26.8.2 managed by the Keycloak Operator 26.8.2.
+# Two instances share sessions through the embedded Infinispan cache; the
+# operator configures the cluster discovery and the database.
+apiVersion: k8s.keycloak.org/v2alpha1
+kind: Keycloak
+metadata:
+  name: keycloak
+  namespace: keycloak
+spec:
+  instances: 2
+  db:
+    vendor: postgres
+    host: keycloak-db-rw
+    port: 5432
+    database: keycloak
+    usernameSecret:
+      name: keycloak-db-app
+      key: username
+    passwordSecret:
+      name: keycloak-db-app
+      key: password
+  http:
+    # Local track only. In production Keycloak terminates TLS too (http.tlsSecret).
+    httpEnabled: true
+    httpPort: 8080
+  hostname:
+    # Issuer of every realm: <hostname>/realms/<realm>. Pods resolve this name to
+    # the Keycloak service through a CoreDNS rewrite (scripts/live-up.sh); your
+    # machine resolves *.localtest.me to 127.0.0.1 and reaches it by port-forward.
+    hostname: http://keycloak.localtest.me:8080
+    # The admin console is generated for a separate host. On AKS that host is
+    # only on the internal load balancer (case view I3).
+    admin: http://keycloak-admin.localtest.me:8080
+    strict: true
+  # The cluster CA, so that Keycloak can fetch the service-account issuer's
+  # discovery document and JWKS from the API server over TLS.
+  truststores:
+    kubernetes-ca:
+      configMap:
+        name: kube-root-ca.crt
+  networkPolicy:
+    enabled: true
+  scheduling:
+    topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: keycloak
+  resources:
+    requests:
+      cpu: 250m
+      memory: 1Gi
+    limits:
+      memory: 2Gi

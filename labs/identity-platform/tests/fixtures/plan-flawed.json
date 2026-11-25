@@ -1,0 +1,193 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.11.0",
+  "_comment": "Hand-built in the structure of `terraform show -json` (format_version 1.2): the plan of starter/terraform/platform.tf against a realm that still has a client legacy-spa. Note that client_secret appears in clear text: plan JSON contains sensitive values.",
+  "resource_changes": [
+    {
+      "address": "keycloak_realm.platform",
+      "mode": "managed",
+      "type": "keycloak_realm",
+      "name": "platform",
+      "provider_name": "registry.terraform.io/keycloak/keycloak",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "realm": "platform",
+          "enabled": true,
+          "ssl_required": "none",
+          "access_token_lifespan": "30m",
+          "revoke_refresh_token": false,
+          "refresh_token_max_reuse": 0,
+          "security_defenses": []
+        }
+      }
+    },
+    {
+      "address": "keycloak_oidc_identity_provider.corporate",
+      "mode": "managed",
+      "type": "keycloak_oidc_identity_provider",
+      "name": "corporate",
+      "provider_name": "registry.terraform.io/keycloak/keycloak",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "realm": "platform",
+          "alias": "corporate",
+          "authorization_url": "http://keycloak.localtest.me:8080/realms/corporate/protocol/openid-connect/auth",
+          "token_url": "http://keycloak.localtest.me:8080/realms/corporate/protocol/openid-connect/token",
+          "jwks_url": "",
+          "client_id": "platform-broker",
+          "client_secret": "broker-secret-from-the-wiki",
+          "validate_signature": false,
+          "trust_email": true,
+          "sync_mode": "LEGACY"
+        }
+      }
+    },
+    {
+      "address": "keycloak_openid_client.portal_web",
+      "mode": "managed",
+      "type": "keycloak_openid_client",
+      "name": "portal_web",
+      "provider_name": "registry.terraform.io/keycloak/keycloak",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "realm_id": "platform",
+          "enabled": true,
+          "access_type": "PUBLIC",
+          "client_authenticator_type": "client-secret",
+          "standard_flow_enabled": true,
+          "implicit_flow_enabled": true,
+          "direct_access_grants_enabled": false,
+          "service_accounts_enabled": false,
+          "valid_redirect_uris": [
+            "https://portal.example.org/*",
+            "http://portal.example.org/callback"
+          ],
+          "web_origins": [
+            "*"
+          ],
+          "pkce_code_challenge_method": "",
+          "full_scope_allowed": true,
+          "access_token_lifespan": "",
+          "client_secret": null,
+          "client_secret_wo_version": null,
+          "standard_token_exchange_enabled": false,
+          "extra_config": null,
+          "client_id": "portal-web"
+        }
+      }
+    },
+    {
+      "address": "keycloak_openid_client.benefits_api",
+      "mode": "managed",
+      "type": "keycloak_openid_client",
+      "name": "benefits_api",
+      "provider_name": "registry.terraform.io/keycloak/keycloak",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "realm_id": "platform",
+          "enabled": true,
+          "access_type": "CONFIDENTIAL",
+          "client_authenticator_type": "client-secret",
+          "standard_flow_enabled": false,
+          "implicit_flow_enabled": false,
+          "direct_access_grants_enabled": true,
+          "service_accounts_enabled": true,
+          "valid_redirect_uris": null,
+          "web_origins": null,
+          "pkce_code_challenge_method": "",
+          "full_scope_allowed": true,
+          "access_token_lifespan": "",
+          "client_secret": "generated-by-keycloak-3f9a",
+          "client_secret_wo_version": null,
+          "standard_token_exchange_enabled": false,
+          "extra_config": null,
+          "client_id": "benefits-api"
+        }
+      }
+    },
+    {
+      "address": "keycloak_openid_client.claims_worker",
+      "mode": "managed",
+      "type": "keycloak_openid_client",
+      "name": "claims_worker",
+      "provider_name": "registry.terraform.io/keycloak/keycloak",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "realm_id": "platform",
+          "enabled": true,
+          "access_type": "CONFIDENTIAL",
+          "client_authenticator_type": "client-secret",
+          "standard_flow_enabled": false,
+          "implicit_flow_enabled": false,
+          "direct_access_grants_enabled": false,
+          "service_accounts_enabled": true,
+          "valid_redirect_uris": null,
+          "web_origins": null,
+          "pkce_code_challenge_method": "",
+          "full_scope_allowed": true,
+          "access_token_lifespan": "",
+          "client_secret": "w0rker-s3cret",
+          "client_secret_wo_version": null,
+          "standard_token_exchange_enabled": false,
+          "extra_config": null,
+          "client_id": "claims-worker"
+        }
+      }
+    },
+    {
+      "address": "keycloak_openid_client.legacy_spa",
+      "mode": "managed",
+      "type": "keycloak_openid_client",
+      "name": "legacy_spa",
+      "provider_name": "registry.terraform.io/keycloak/keycloak",
+      "change": {
+        "actions": [
+          "delete"
+        ],
+        "before": {
+          "realm_id": "platform",
+          "enabled": true,
+          "access_type": "PUBLIC",
+          "client_authenticator_type": "client-secret",
+          "standard_flow_enabled": false,
+          "implicit_flow_enabled": true,
+          "direct_access_grants_enabled": false,
+          "service_accounts_enabled": false,
+          "valid_redirect_uris": [
+            "*"
+          ],
+          "web_origins": null,
+          "pkce_code_challenge_method": "",
+          "full_scope_allowed": true,
+          "access_token_lifespan": "",
+          "client_secret": null,
+          "client_secret_wo_version": null,
+          "standard_token_exchange_enabled": false,
+          "extra_config": null,
+          "client_id": "legacy-spa"
+        },
+        "after": null
+      }
+    }
+  ]
+}

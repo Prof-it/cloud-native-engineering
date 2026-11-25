@@ -24,6 +24,7 @@ Labs are grouped by capability, not by session. Each capability folder contains 
 9. **security-gates** – Fail-closed security gates, negative controls, bounded exceptions, gate protection and detection rules as code
 10. **devsecops-toolchain** – Assessing real scanners (Bandit, pip-audit, Gitleaks, Trivy, ZAP) by measured behaviour and turning their reports into fail-closed gate evidence
 11. **workload-identity-federation** – OIDC trust rules of AWS, Azure and Google Cloud evaluated offline: immutable IDs, the subject format change, name takeover, and bootstrap versus deployment
+12. **identity-platform** – Keycloak on Kubernetes with its operator and CloudNativePG, realms as code in Terraform, service-account federation and token exchange; offline token validation, plan guardrails and drift detection, plus a live track on kind
 
 Each lab README follows a standard structure:
 - Objective
@@ -62,7 +63,7 @@ Execution contract for every lab:
 - A working Docker installation
 - Access to a Kubernetes cluster (local or cloud)
 - Terraform CLI
-- Python 3.9+ and OpenSSL (release-promotion lab); Python 3.9+ (security-gates and devsecops-toolchain labs; the latter optionally Bandit, pip-audit, Gitleaks, Trivy and OpenTofu for live mode); Python 3.9+ (workload-identity-federation lab, no cloud account needed)
+- Python 3.9+ and OpenSSL (release-promotion lab); Python 3.9+ (security-gates and devsecops-toolchain labs; the latter optionally Bandit, pip-audit, Gitleaks, Trivy and OpenTofu for live mode); Python 3.9+ (workload-identity-federation lab, no cloud account needed); Python 3.9+ for the offline track of the identity-platform lab, plus Docker, kind, kubectl and Terraform 1.11+ or OpenTofu for its live track
 - Git and a GitHub account
 - Basic command-line proficiency
 

@@ -1,0 +1,141 @@
+# The benefits API (resource server, token exchange to the documents API) and
+# the claims worker (machine client). Neither holds a client secret: each
+# presents its projected service-account token, audience = platform realm.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: benefits-api
+  namespace: claims
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: claims-worker
+  namespace: claims
+automountServiceAccountToken: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: benefits-api
+  namespace: claims
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: benefits-api}
+  template:
+    metadata:
+      labels: {app: benefits-api}
+    spec:
+      serviceAccountName: benefits-api
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: api
+          image: python:3.13-slim
+          command: ["python", "/app/api.py"]
+          env:
+            - {name: ISSUER, value: "http://keycloak.localtest.me:8080/realms/platform"}
+            - {name: AUDIENCE, value: "benefits-api"}
+            - {name: REQUIRED_ROLE, value: "benefits:read"}
+            - {name: CLIENT_ID, value: "benefits-api"}
+            - {name: DOWNSTREAM_AUDIENCE, value: "documents-api"}
+            - {name: SA_TOKEN_FILE, value: "/var/run/secrets/keycloak/token"}
+            - {name: PYTHONDONTWRITEBYTECODE, value: "1"}
+          ports:
+            - {containerPort: 8080, name: http}
+          readinessProbe:
+            httpGet: {path: /healthz, port: http}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: ["ALL"]}
+          volumeMounts:
+            - {name: code, mountPath: /app, readOnly: true}
+            - {name: keycloak-token, mountPath: /var/run/secrets/keycloak, readOnly: true}
+      volumes:
+        - name: code
+          configMap: {name: identity-lab-code}
+        - name: keycloak-token
+          projected:
+            sources:
+              - serviceAccountToken:
+                  audience: http://keycloak.localtest.me:8080/realms/platform
+                  expirationSeconds: 600
+                  path: token
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: benefits-api
+  namespace: claims
+spec:
+  selector: {app: benefits-api}
+  ports:
+    - {port: 8080, targetPort: http, name: http}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: claims-worker
+  namespace: claims
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: claims-worker}
+  template:
+    metadata:
+      labels: {app: claims-worker}
+    spec:
+      serviceAccountName: claims-worker
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: worker
+          image: python:3.13-slim
+          command: ["python", "/app/worker.py"]
+          env:
+            - {name: TOKEN_ENDPOINT, value: "http://keycloak.localtest.me:8080/realms/platform/protocol/openid-connect/token"}
+            - {name: CLIENT_ID, value: "claims-worker"}
+            - {name: API_URL, value: "http://benefits-api.claims.svc:8080"}
+            - {name: SA_TOKEN_FILE, value: "/var/run/secrets/keycloak/token"}
+            - {name: PYTHONDONTWRITEBYTECODE, value: "1"}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: ["ALL"]}
+          volumeMounts:
+            - {name: code, mountPath: /app, readOnly: true}
+            - {name: keycloak-token, mountPath: /var/run/secrets/keycloak, readOnly: true}
+      volumes:
+        - name: code
+          configMap: {name: identity-lab-code}
+        - name: keycloak-token
+          projected:
+            sources:
+              - serviceAccountToken:
+                  audience: http://keycloak.localtest.me:8080/realms/platform
+                  expirationSeconds: 600
+                  path: token
+---
+# Only the worker may call the API.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: benefits-api-ingress
+  namespace: claims
+spec:
+  podSelector:
+    matchLabels: {app: benefits-api}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: {app: claims-worker}
+      ports:
+        - {port: 8080, protocol: TCP}

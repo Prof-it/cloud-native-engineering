@@ -1,0 +1,9 @@
+# Local cluster for the live track. One control plane and two workers, so that
+# two Keycloak pods and two PostgreSQL instances land on different nodes.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: identity-lab
+nodes:
+  - role: control-plane
+  - role: worker
+  - role: worker

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: keycloak
+  labels:
+    # baseline enforced, restricted reported: check the warnings for the
+    # operator-generated pods before tightening to restricted.
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/warn: restricted
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: claims
+  labels:
+    pod-security.kubernetes.io/enforce: restricted

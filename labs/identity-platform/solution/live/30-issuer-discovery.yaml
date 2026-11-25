@@ -1,0 +1,19 @@
+# Keycloak reads the cluster's service-account issuer anonymously:
+#   https://kubernetes.default.svc.cluster.local/.well-known/openid-configuration
+#   and the jwks_uri it names (/openid/v1/jwks).
+# Kubernetes binds system:service-account-issuer-discovery to authenticated
+# service accounts only. LOCAL TRACK ONLY: allow unauthenticated reads of these
+# two public documents. On AKS the issuer is a public Azure endpoint and this
+# binding is not needed.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: lab-anonymous-issuer-discovery
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:service-account-issuer-discovery
+subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: Group
+    name: system:unauthenticated

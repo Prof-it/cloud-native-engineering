@@ -1,0 +1,304 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.11.0",
+  "_comment": "Hand-built in the structure of `terraform show -json` (format_version 1.2), resource_changes only. Values are what solution/live/terraform plans for a fresh Keycloak; unknown IDs are omitted. Write-only secrets appear nowhere, which is the point.",
+  "resource_changes": [
+    {
+      "address": "keycloak_realm.corporate",
+      "mode": "managed",
+      "type": "keycloak_realm",
+      "name": "corporate",
+      "provider_name": "registry.terraform.io/keycloak/keycloak",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "realm": "corporate",
+          "enabled": true,
+          "ssl_required": "external",
+          "access_token_lifespan": "5m",
+          "revoke_refresh_token": true,
+          "refresh_token_max_reuse": 0,
+          "security_defenses": [
+            {
+              "headers": [],
+              "brute_force_detection": [
+                {
+                  "max_login_failures": 5,
+                  "wait_increment_seconds": 60,
+                  "max_failure_wait_seconds": 900,
+                  "failure_reset_time_seconds": 900,
+                  "permanent_lockout": false
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "address": "keycloak_realm.platform",
+      "mode": "managed",
+      "type": "keycloak_realm",
+      "name": "platform",
+      "provider_name": "registry.terraform.io/keycloak/keycloak",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "realm": "platform",
+          "enabled": true,
+          "ssl_required": "external",
+          "access_token_lifespan": "5m",
+          "revoke_refresh_token": true,
+          "refresh_token_max_reuse": 0,
+          "terraform_deletion_protection": false,
+          "security_defenses": [
+            {
+              "headers": [
+                {
+                  "x_frame_options": "DENY"
+                }
+              ],
+              "brute_force_detection": [
+                {
+                  "max_login_failures": 5,
+                  "wait_increment_seconds": 60,
+                  "max_failure_wait_seconds": 900,
+                  "failure_reset_time_seconds": 900,
+                  "permanent_lockout": false
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "address": "keycloak_openid_client.platform_broker",
+      "mode": "managed",
+      "type": "keycloak_openid_client",
+      "name": "platform_broker",
+      "provider_name": "registry.terraform.io/keycloak/keycloak",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "realm_id": "corporate",
+          "enabled": true,
+          "access_type": "CONFIDENTIAL",
+          "client_authenticator_type": "client-secret",
+          "standard_flow_enabled": true,
+          "implicit_flow_enabled": false,
+          "direct_access_grants_enabled": false,
+          "service_accounts_enabled": false,
+          "valid_redirect_uris": [
+            "http://keycloak.localtest.me:8080/realms/platform/broker/corporate/endpoint"
+          ],
+          "web_origins": null,
+          "pkce_code_challenge_method": "S256",
+          "full_scope_allowed": false,
+          "access_token_lifespan": "",
+          "client_secret": null,
+          "client_secret_wo_version": "1",
+          "standard_token_exchange_enabled": false,
+          "extra_config": null,
+          "client_id": "platform-broker"
+        }
+      }
+    },
+    {
+      "address": "keycloak_openid_client.benefits_api",
+      "mode": "managed",
+      "type": "keycloak_openid_client",
+      "name": "benefits_api",
+      "provider_name": "registry.terraform.io/keycloak/keycloak",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "realm_id": "platform",
+          "enabled": true,
+          "access_type": "CONFIDENTIAL",
+          "client_authenticator_type": "federated-jwt",
+          "standard_flow_enabled": false,
+          "implicit_flow_enabled": false,
+          "direct_access_grants_enabled": false,
+          "service_accounts_enabled": true,
+          "valid_redirect_uris": null,
+          "web_origins": null,
+          "pkce_code_challenge_method": "",
+          "full_scope_allowed": false,
+          "access_token_lifespan": "",
+          "client_secret": null,
+          "client_secret_wo_version": null,
+          "standard_token_exchange_enabled": true,
+          "extra_config": {
+            "jwt.credential.issuer": "cluster",
+            "jwt.credential.sub": "system:serviceaccount:claims:benefits-api"
+          },
+          "client_id": "benefits-api"
+        }
+      }
+    },
+    {
+      "address": "keycloak_openid_client.documents_api",
+      "mode": "managed",
+      "type": "keycloak_openid_client",
+      "name": "documents_api",
+      "provider_name": "registry.terraform.io/keycloak/keycloak",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "realm_id": "platform",
+          "enabled": true,
+          "access_type": "BEARER-ONLY",
+          "client_authenticator_type": "client-secret",
+          "standard_flow_enabled": false,
+          "implicit_flow_enabled": false,
+          "direct_access_grants_enabled": false,
+          "service_accounts_enabled": false,
+          "valid_redirect_uris": null,
+          "web_origins": null,
+          "pkce_code_challenge_method": "",
+          "full_scope_allowed": false,
+          "access_token_lifespan": "",
+          "client_secret": null,
+          "client_secret_wo_version": null,
+          "standard_token_exchange_enabled": false,
+          "extra_config": null,
+          "client_id": "documents-api"
+        }
+      }
+    },
+    {
+      "address": "keycloak_openid_client.portal_web",
+      "mode": "managed",
+      "type": "keycloak_openid_client",
+      "name": "portal_web",
+      "provider_name": "registry.terraform.io/keycloak/keycloak",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "realm_id": "platform",
+          "enabled": true,
+          "access_type": "PUBLIC",
+          "client_authenticator_type": "client-secret",
+          "standard_flow_enabled": true,
+          "implicit_flow_enabled": false,
+          "direct_access_grants_enabled": false,
+          "service_accounts_enabled": false,
+          "valid_redirect_uris": [
+            "http://portal.localtest.me:3000/callback"
+          ],
+          "web_origins": [
+            "+"
+          ],
+          "pkce_code_challenge_method": "S256",
+          "full_scope_allowed": false,
+          "access_token_lifespan": "300",
+          "client_secret": null,
+          "client_secret_wo_version": null,
+          "standard_token_exchange_enabled": false,
+          "extra_config": null,
+          "client_id": "portal-web"
+        }
+      }
+    },
+    {
+      "address": "keycloak_openid_client.claims_worker",
+      "mode": "managed",
+      "type": "keycloak_openid_client",
+      "name": "claims_worker",
+      "provider_name": "registry.terraform.io/keycloak/keycloak",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "realm_id": "platform",
+          "enabled": true,
+          "access_type": "CONFIDENTIAL",
+          "client_authenticator_type": "federated-jwt",
+          "standard_flow_enabled": false,
+          "implicit_flow_enabled": false,
+          "direct_access_grants_enabled": false,
+          "service_accounts_enabled": true,
+          "valid_redirect_uris": null,
+          "web_origins": null,
+          "pkce_code_challenge_method": "",
+          "full_scope_allowed": false,
+          "access_token_lifespan": "300",
+          "client_secret": null,
+          "client_secret_wo_version": null,
+          "standard_token_exchange_enabled": false,
+          "extra_config": {
+            "jwt.credential.issuer": "cluster",
+            "jwt.credential.sub": "system:serviceaccount:claims:claims-worker"
+          },
+          "client_id": "claims-worker"
+        }
+      }
+    },
+    {
+      "address": "keycloak_oidc_identity_provider.corporate",
+      "mode": "managed",
+      "type": "keycloak_oidc_identity_provider",
+      "name": "corporate",
+      "provider_name": "registry.terraform.io/keycloak/keycloak",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "realm": "platform",
+          "alias": "corporate",
+          "authorization_url": "http://keycloak.localtest.me:8080/realms/corporate/protocol/openid-connect/auth",
+          "token_url": "http://keycloak.localtest.me:8080/realms/corporate/protocol/openid-connect/token",
+          "jwks_url": "http://keycloak.localtest.me:8080/realms/corporate/protocol/openid-connect/certs",
+          "issuer": "http://keycloak.localtest.me:8080/realms/corporate",
+          "client_id": "platform-broker",
+          "client_secret": null,
+          "client_secret_wo_version": "1",
+          "validate_signature": true,
+          "trust_email": false,
+          "sync_mode": "FORCE"
+        }
+      }
+    },
+    {
+      "address": "keycloak_kubernetes_identity_provider.cluster",
+      "mode": "managed",
+      "type": "keycloak_kubernetes_identity_provider",
+      "name": "cluster",
+      "provider_name": "registry.terraform.io/keycloak/keycloak",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "realm": "platform",
+          "alias": "cluster",
+          "issuer": "https://kubernetes.default.svc.cluster.local"
+        }
+      }
+    }
+  ]
+}
