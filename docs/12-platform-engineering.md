@@ -71,6 +71,8 @@ AI platform capabilities include model lifecycle automation, secure inference pa
 - [GitOps Pattern](../patterns/gitops.md)
 - [Rolling Updates Pattern](../patterns/rolling-updates.md)
 - [DevOps](./08-devops.md)
+- [Case: Statutory Health Insurer, Identity Layer of an Internal Developer Platform](../case-studies/health-insurer-identity-platform/README.md)
+- [Identity Platform Lab](../labs/identity-platform/README.md)
 
 ## Further Reading
 

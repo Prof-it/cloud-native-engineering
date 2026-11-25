@@ -106,6 +106,8 @@ AI introduces new concerns including model integrity, prompt-surface risks, data
 - [DevSecOps Toolchain Lab](../labs/devsecops-toolchain/README.md)
 - [Case: Charity Website on Azure Container Apps, Platform Bootstrap and Workload Identity](../case-studies/charity-site-azure-container-apps/README.md)
 - [Workload Identity Federation Lab](../labs/workload-identity-federation/README.md)
+- [Case: Statutory Health Insurer, Identity Layer of an Internal Developer Platform](../case-studies/health-insurer-identity-platform/README.md)
+- [Identity Platform Lab](../labs/identity-platform/README.md)
 
 ## Further Reading
 
