@@ -8,13 +8,15 @@ import importlib.util
 import json
 import os
 import sys
+import mint  # noqa: E402
+import copy  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 LAB = os.path.dirname(HERE)
 IMPL = os.environ.get("LAB_IMPL", "solution")
 FIX = os.path.join(HERE, "fixtures")
 sys.path.insert(0, HERE)
-import mint  # noqa: E402
+
 
 
 def load(module):
@@ -179,6 +181,20 @@ check("D3 client that no code manages is found",
 check("D4 built-in clients and the other realm's clients are not drift",
       lambda: (not any(o in {"client/account", "client/admin-cli", "client/platform-broker"} for _, o, _ in kinds),
                "none reported" if not any(o in {"client/account", "client/admin-cli", "client/platform-broker"} for _, o, _ in kinds) else "reported"))
+
+# D5: a plan that creates the realms has realm_id unknown (null). The client of
+# the other realm must still not count; its realm comes from the configuration.
+unknown = copy.deepcopy(fixture("plan-solution.json"))
+unknown["configuration"] = {"root_module": {"resources": []}}
+for rc in unknown["resource_changes"]:
+    if rc["type"] == "keycloak_openid_client":
+        realm = rc["change"]["after"].pop("realm_id")
+        unknown["configuration"]["root_module"]["resources"].append(
+            {"address": rc["address"], "expressions": {"realm_id": {"references": [f"keycloak_realm.{realm}.id", f"keycloak_realm.{realm}"]}}})
+kinds_unknown = {(d["kind"], d["object"]) for d in dr.compare(unknown, fixture("realm-export-platform.json"))}
+check("D5 other realm's client not drift when realm_id is unknown at plan time",
+      lambda: (("missing", "client/platform-broker") not in kinds_unknown,
+               "not reported" if ("missing", "client/platform-broker") not in kinds_unknown else "reported as missing"))
 
 passed = sum(1 for _, ok, _ in results if ok)
 lines = [f"{'PASS' if ok else 'FAIL'}  {name}  ({detail})" for name, ok, detail in results]

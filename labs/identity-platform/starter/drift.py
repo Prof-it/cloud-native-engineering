@@ -29,7 +29,9 @@ def compare(plan, export):
                     findings.append({"kind": "changed", "object": f"realm/{export['realm']}", "field": rep_field,
                                      "desired": after[tf_attr], "live": export.get(rep_field)})
     # EXERCISE D2: compare each keycloak_openid_client with the client of the same clientId,
-    #              including redirect URIs added in the admin console.
+    #              including redirect URIs added in the admin console. Only the clients of
+    #              this realm count: in a plan that creates the realm, realm_id is null, so
+    #              read the realm from plan["configuration"] (expressions.realm_id.references).
     # EXERCISE D3: report clients that exist in Keycloak but in no Terraform code,
     #              ignoring the clients Keycloak creates in every realm.
     return findings

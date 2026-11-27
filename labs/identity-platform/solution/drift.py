@@ -47,15 +47,36 @@ def access_type(c):
     return "PUBLIC" if c.get("publicClient") else "CONFIDENTIAL"
 
 
+def realm_references(plan):
+    """Map resource address -> address of the keycloak_realm its realm_id refers to.
+
+    In a plan that creates the realm, realm_id is unknown (null in the JSON),
+    so the realm of a client can only be read from the configuration, where
+    `realm_id = keycloak_realm.corporate.id` appears as a reference.
+    """
+    refs = {}
+    for r in plan.get("configuration", {}).get("root_module", {}).get("resources", []):
+        for ref in r.get("expressions", {}).get("realm_id", {}).get("references", []):
+            if ref.startswith("keycloak_realm.") and ref.count(".") == 1:
+                refs[r["address"]] = ref
+    return refs
+
+
 def compare(plan, export):
     realm_name = export.get("realm")
+    resources = list(planned_resources(plan))
+    realm_names = {addr: after.get("realm") for addr, rtype, after in resources if rtype == "keycloak_realm"}
+    refs = realm_references(plan)
     desired_realm, desired_clients = None, {}
-    for addr, rtype, after in planned_resources(plan):
+    for addr, rtype, after in resources:
         if rtype == "keycloak_realm" and after.get("realm") == realm_name:
             desired_realm = after
-        elif rtype == "keycloak_openid_client" and after.get("realm_id") in (realm_name, None):
-            # realm_id is known once the realm exists, which is when drift can occur.
-            desired_clients[after["client_id"]] = (addr, after)
+        elif rtype == "keycloak_openid_client":
+            # realm_id is the realm name once the realm exists; in a plan that
+            # creates the realm it is unknown, so resolve it via the reference.
+            client_realm = after.get("realm_id") or realm_names.get(refs.get(addr))
+            if client_realm == realm_name:
+                desired_clients[after["client_id"]] = (addr, after)
     findings = []
     if desired_realm is None:
         return [{"kind": "unmanaged-realm", "object": realm_name}]

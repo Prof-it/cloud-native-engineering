@@ -58,6 +58,15 @@ resource "keycloak_user" "anna" {
     temporary        = true
   }
   required_actions = ["CONFIGURE_TOTP"]
+
+  # Required actions are onboarding state, not desired state. Keycloak adds
+  # UPDATE_PASSWORD itself because the initial password is temporary, and it
+  # removes both actions once Anna has completed them. Without ignore_changes
+  # every plan would show drift, and every apply would force her to set a new
+  # password and enrol TOTP again. The actions are still set on create.
+  lifecycle {
+    ignore_changes = [required_actions]
+  }
 }
 
 resource "keycloak_group_memberships" "case_workers" {

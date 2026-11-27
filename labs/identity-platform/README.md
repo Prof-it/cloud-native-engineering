@@ -8,8 +8,8 @@ The lab has two tracks:
 
 | Track | Needs | What you see | Status in this repository |
 |---|---|---|---|
-| **Offline** | Python 3.9+ | Token validation (case view I5), guardrails on a Terraform plan (I4, I6, I7) and drift detection (I7), each as starter and solution | **Executed**: solution 36 of 36 checks, starter 11 of 36, reference checks 17 of 17 |
-| **Live, local** | Docker, kind, kubectl, Terraform ≥ 1.11, curl | The whole chain on your laptop: CloudNativePG, Keycloak Operator 26.8.2, two realms from Terraform, the API and the worker | **Not executed** by the author (no container runtime available); manifests validated against the operators' CRD schemas, Terraform attributes checked against the provider 5.11.0 source, scripts pass ShellCheck |
+| **Offline** | Python 3.9+ | Token validation (case view I5), guardrails on a Terraform plan (I4, I6, I7) and drift detection (I7), each as starter and solution | **Executed**: solution 37 of 37 checks, starter 12 of 37, reference checks 17 of 17 |
+| **Live, local** | Docker, kind, kubectl, Terraform ≥ 1.11, curl | The whole chain on your laptop: CloudNativePG, Keycloak Operator 26.8.2, two realms from Terraform, the API and the worker | **Executed** on 27 November 2026 (macOS, Apple silicon): checks L1 to L7 passed, `terraform plan` shows no changes after apply. The first run found nine problems that static checks had missed, see [Lessons from the First Live Run](#lessons-from-the-first-live-run) |
 
 By the end you can explain and enforce:
 
@@ -127,7 +127,7 @@ flowchart LR
    LAB_IMPL=starter python3 tests/run_tests.py
    ```
 
-   The starter passes 11 of 36. Before reading code, pick three failures and write down what an attacker would send. Start with T03: the starter verifies an `HS256` token with the issuer's *public* key as HMAC secret, so anyone who can read the JWKS can sign tokens.
+   The starter passes 12 of 37. Before reading code, pick three failures and write down what an attacker would send. Start with T03: the starter verifies an `HS256` token with the issuer's *public* key as HMAC secret, so anyone who can read the JWKS can sign tokens.
 
 2. **Fix `starter/tokencheck.py`** along its `EXERCISE` comments. Each maps to a row of case view I5:
 
@@ -198,25 +198,74 @@ flowchart LR
 
 ## Validation
 
-- `python3 tests/run_tests.py` reports `solution: 36 passed, 0 failed`; with `LAB_IMPL=starter`, after your work, the same.
+- `python3 tests/run_tests.py` reports `solution: 37 passed, 0 failed`; with `LAB_IMPL=starter`, after your work, the same.
 - `python3 tests/check_reference.py` reports `reference: 17 passed, 0 failed`.
 - `./scripts/run.sh` then `./scripts/verify.sh` succeed.
-- Live track: `./scripts/live-verify.sh` reports `status: verified-live` with L1 to L7 passed.
+- Live track: `./scripts/live-verify.sh` reports `status: verified-live` with L1 to L7 passed and `terraform plan -detailed-exitcode: 0`.
 
 ## What Was Verified, and What Is Still Open
 
-Executed here: the offline track (all scripts, both implementations), interoperability of the standard-library RS256 code with PyJWT in both directions, `KeycloakRealmImport` and `Keycloak` manifests against the CRD schemas of 26.8.2, the CloudNativePG `Cluster` against the 1.30.2 CRD, every attribute in both Terraform directories of the realm code against the provider 5.11.0 schema source, ShellCheck on all scripts.
+**Offline track.** All scripts with both implementations, interoperability of the standard-library RS256 code with PyJWT in both directions, the manifests against the CRD schemas of Keycloak Operator 26.8.2 and CloudNativePG 1.30.2, the Terraform attributes against the provider 5.11.0 schema source.
 
-Not executed, and the points most likely to need adjustment on first run:
+**Live track, executed on 27 November 2026.**
 
-| Point | Why it is uncertain | What to check |
+| Component | Version |
+|---|---|
+| Host | macOS, Apple silicon, Docker CLI with an engine VM of 7 GiB |
+| kind / kubectl | v0.33.0 / v1.36.1 |
+| Terraform | v1.17.2, provider `keycloak/keycloak` 5.11.0 |
+| Keycloak and Keycloak Operator | 26.8.2, `k8s.keycloak.org/v2beta1` |
+| CloudNativePG | 1.30.2 |
+
+| Check | What it showed |
+|---|---|
+| L1 | The worker gets a token with its projected service-account token alone (federated client authentication, no client secret) and the API accepts it |
+| L2 | Standard token exchange yields a token with audience `documents-api`, role `documents:read`, `azp` `benefits-api` and the caller's `sub` |
+| L3 | A token with a forged role is refused with `bad_signature` |
+| L4 | `claims-worker` without a client assertion is refused (401) |
+| L5 | `claims-worker` presenting the service-account token of `benefits-api` is refused (400) |
+| L6 | A second `KeycloakRealmImport` with lifetime 900 leaves the realm at 300 |
+| L7 | `drift.py` finds no drift; `terraform plan -detailed-exitcode` returns 0 after apply |
+
+Open points, after the run:
+
+| Point | Status | What to check |
 |---|---|---|
-| Client authentication flow | The flow is a copy of the built-in `clients` flow plus `federated-jwt`. If your Keycloak version's built-in flow already contains `federated-jwt`, the execution is duplicated | Authentication → Flows in the admin console; remove the extra execution |
-| Kubernetes issuer discovery on kind | Keycloak fetches the `jwks_uri` named by the API server, which on kind is the control-plane node address | `kubectl get --raw /.well-known/openid-configuration`; the address must be reachable from pods and in the API server certificate |
-| Token exchange audience | Keycloak grants `audience=documents-api` only if `documents-api` is available to the requester; the lab provides it through the audience scope and the role scope mapping | The `downstream` field of the API response; Keycloak's server log on `invalid_request` |
-| Pod Security | Namespace `keycloak` enforces `baseline` and warns on `restricted`; the operator-generated pods were not checked against `restricted` | Warnings printed by `kubectl apply` |
-| Actor claim | Keycloak's standard token exchange does not add an `act` claim; delegation (`token-exchange-delegation:v1`) is a preview feature | Case view I6 asks for the calling service as actor; record this gap in the review |
-| Provider documentation | The provider's page for `keycloak_kubernetes_identity_provider` still calls the feature preview; in Keycloak 26.8 `kubernetes-service-accounts` and `client-auth-federated` are enabled by default | `kc.sh show-config` or the server info page |
+| Kubernetes issuer discovery on kind | **Resolved.** L1 requires Keycloak to fetch the API server's JWKS, which works with the cluster CA in the truststore and anonymous discovery allowed | On a managed cluster: the public OIDC issuer instead of the API server |
+| Token exchange audience | **Resolved.** The audience scope plus the role scope mapping make `documents-api` available to `benefits-api` (L2) | The `downstream` field of the API response |
+| Client authentication flow | **Works, not inspected.** The apply created the `federated-jwt` execution without error and L1 authenticates through it. Whether the copied built-in flow already contained the authenticator was not checked | Authentication → Flows → `clients-with-federated-jwt` in the admin console |
+| Actor claim | **Confirmed gap.** The exchanged token carries the user's `sub` and `azp` `benefits-api`, but no `act` claim, so `documents-api` cannot see the calling service from the token. Delegation (`token-exchange-delegation:v1`) is a preview feature | Case view I6 asks for the calling service as actor: decide between logging the chain through `azp` and a custom protocol mapper, and record the decision |
+| Pod Security | **Open.** Namespace `keycloak` enforces `baseline`; `kubectl apply` of the operator printed warnings against `restricted`. The operator-generated Keycloak pods were not checked against `restricted` | `kubectl label --dry-run=server --overwrite ns keycloak pod-security.kubernetes.io/enforce=restricted` lists the violating pods |
+| Deprecated scope resource | **Open.** The provider warns that `keycloak_openid_client_default_scopes` is deprecated in favour of `keycloak_client_scope_assignments`. It still works | Migrating touches `clients.tf`, the guardrails and the plan fixtures together |
+| Provider documentation | **Unchanged.** The provider's page for `keycloak_kubernetes_identity_provider` still calls the feature preview; in Keycloak 26.8 `kubernetes-service-accounts` and `client-auth-federated` are enabled by default | `kc.sh show-config` or the server info page |
+
+## Lessons from the First Live Run
+
+The offline checks, the CRD schema validation and the provider schema check all passed before the first live run. The live run still failed nine times. Every failure was in the lab's own code or scripts, none in the architecture. All are fixed in this repository.
+
+| # | Symptom | Cause | Fix |
+|---|---|---|---|
+| 1 | `live-up.sh` stops at once: no container engine | `kind` needs a running Docker-compatible engine. On macOS the `docker` CLI alone is not enough | `setup.sh --live` and `live-up.sh` detect the engine, start Colima, Docker Desktop, OrbStack or Rancher Desktop if installed, and otherwise print how to install Colima (`scripts/lib/container-runtime.sh`) |
+| 2 | Keycloak Operator never becomes ready; its log shows `Not Found` | The operator 26.8 also watches `KeycloakOIDCClient` and `KeycloakSAMLClient`. Only two of its four CRDs were applied | Apply all four CRDs and wait for `Established` before the operator |
+| 3 | Operator log: client uses deprecated `v2alpha1` | The storage version of `keycloaks` and `keycloakrealmimports` is `v2beta1` | Manifests use `k8s.keycloak.org/v2beta1` |
+| 4 | `Keycloak` CR applied, operator running, no Keycloak pod and no StatefulSet | The operator names the truststore volume after the ConfigMap. `kube-root-ca.crt` gives `truststore-configmap-kube-root-ca.crt`, volume names must not contain dots, and the API server rejects the StatefulSet with 422. The CR status shows `HasErrors`; the pod events show nothing | `live-up.sh` copies the CA into the ConfigMap `kubernetes-ca`. The copy does not follow CA rotation |
+| 5 | `terraform plan`: `"provider_id": conflicts with copy_from` | A copied flow takes its type from the source flow; the provider rejects both arguments together | `copy_from = "clients"` alone |
+| 6 | L6 aborts with `401` from the admin API | The admin token was fetched before the import and a 60 s wait. Master realm access tokens live 60 s | Fetch a fresh admin token for every admin call |
+| 7 | L7 reports `client/platform-broker` missing from realm `platform` | In a plan that creates the realms, `realm_id` is unknown (`null`). `drift.py` treated an unknown realm as a match, so the client of realm `corporate` counted for `platform`. The test fixture always had a known `realm_id` | Resolve the realm through `configuration` → `expressions.realm_id.references`. New test D5 covers the unknown case |
+| 8 | L6 once read the `sandbox` realm without `accessTokenLifespan`; seconds later the full representation came back | Observed right after the second import job; the cause was not determined | L6 reads up to 12 times, 10 s apart |
+| 9 | `terraform plan -detailed-exitcode` returns 2 after a clean apply: `required_actions` loses `UPDATE_PASSWORD` | Keycloak adds `UPDATE_PASSWORD` because the initial password is temporary, and removes both actions after onboarding. Terraform would remove the first and later re-add `CONFIGURE_TOTP`, forcing an onboarded user through onboarding again on every apply | `lifecycle { ignore_changes = [required_actions] }`: set on create, then left to Keycloak |
+
+In the same run, `live-verify.sh` called `terraform plan` without the provider login and without the two ephemeral variables. The plan stopped with exit code 1, and the script first reported that as a plan result. It now passes the bootstrap admin login and placeholders for the write-only secrets, which Terraform never stores or compares.
+
+What these failures have in common:
+
+- **Static validation cannot see what a controller builds.** Failures 4 and 5 come from objects and rules that exist only at reconcile or plan time: the operator's StatefulSet, and the provider's `ConflictsWith` rule, which the published schema does not show. Only running the component catches them.
+- **Look at the custom resource before the pods.** When an operator creates nothing, the reason is in the CR's status conditions and the operator log. Pod events stay empty because no pod exists. `live-up.sh` now writes both into `.work/diagnose-*.txt` on every failed wait.
+- **Exit code 1 is not drift.** `terraform plan -detailed-exitcode` returns 0 for no changes, 2 for changes and 1 for an error. A drift check that treats any non-zero code as drift, or that reports 1 as a result, reports noise.
+- **Test the case the plan really produces.** Fixtures copied from a plan against existing infrastructure hide the unknown values of a first apply (failure 7). The real plan of the first apply belongs in the tests.
+- **Keep lifecycle state out of desired state.** Required actions, temporary passwords and similar onboarding state change on the server by design. Code that manages them as desired state shows permanent drift, and applying it undoes the user's onboarding (failure 9).
+- **Short-lived credentials need short-lived use.** A script that fetches a token and then waits is wrong by construction (failure 6). The same holds for pipelines that fetch a token in one step and use it minutes later.
+- **A clean apply is not the end.** The second plan after apply must be empty. Failure 9 was invisible until then.
 
 ## Common Failure Modes
 
@@ -226,6 +275,7 @@ Not executed, and the points most likely to need adjustment on first run:
 - **Binding a client flow with `federated-jwt` alone.** Every client that still uses a secret or a signed JWT stops authenticating, realm-wide.
 - **Write-only secret on one side only.** The broker secret is written to the corporate client and to the identity provider in the same run. If one of them is recreated without increasing `broker_secret_version`, it receives a new secret and the other keeps the old one: bump the version to resynchronise.
 - **Expecting `KeycloakRealmImport` to update a realm.** It creates once and ignores every later change.
+- **A ConfigMap or Secret name with a dot in a `Keycloak` truststore.** The operator derives the volume name from it, the StatefulSet is rejected, and no pod appears. Read the `Keycloak` CR's status conditions, not the pod events.
 - **Running guardrails on the HCL instead of the plan.** Defaults (such as `full_scope_allowed = true`) and module inputs appear only in the plan.
 
 ## Cleanup
