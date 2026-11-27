@@ -17,12 +17,34 @@ KC_RES="https://raw.githubusercontent.com/keycloak/keycloak-k8s-resources/${KEYC
 CLUSTER="identity-lab"
 TF="${TF:-$(command -v terraform || command -v tofu || true)}"
 
-for bin in docker kind kubectl curl python3; do
+# shellcheck source=lib/container-runtime.sh
+source "$LAB_ROOT/scripts/lib/container-runtime.sh"
+for bin in kind kubectl curl python3; do
   command -v "$bin" >/dev/null 2>&1 || { echo "missing prerequisite: $bin" >&2; exit 1; }
 done
+ensure_container_runtime
 [[ -n "$TF" ]] || { echo "missing prerequisite: terraform (>= 1.11) or tofu" >&2; exit 1; }
 
 step() { echo; echo "== $*"; }
+
+# Print what usually explains a pod that does not become ready, and save it.
+diagnose() {
+  local ns="$1" selector="$2" out
+  out="$WORK/diagnose-$(date +%H%M%S).txt"
+  {
+    echo "### pods in $ns"; kubectl -n "$ns" get pods -o wide
+    echo "### describe ($selector)"; kubectl -n "$ns" describe pods -l "$selector"
+    echo "### logs ($selector)"; kubectl -n "$ns" logs -l "$selector" --all-containers --tail=80
+    echo "### custom resources and their status in $ns"
+    kubectl -n "$ns" get keycloaks.k8s.keycloak.org,clusters.postgresql.cnpg.io,statefulsets -o wide
+    kubectl -n "$ns" get keycloaks.k8s.keycloak.org -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{range .status.conditions[*]}  {.type}={.status}: {.message}{"\n"}{end}{end}'
+    echo "### operator log (errors and warnings)"
+    kubectl -n "$ns" logs deploy/keycloak-operator --tail=300 2>/dev/null | grep -E "ERROR|WARN|Exception|Caused by" | tail -20
+    echo "### recent events in $ns"; kubectl -n "$ns" get events --sort-by=.lastTimestamp | tail -25
+  } > "$out" 2>&1
+  tail -60 "$out" >&2
+  echo "full diagnostics: $out" >&2
+}
 
 step "1/8 kind cluster"
 kind get clusters | grep -qx "$CLUSTER" || kind create cluster --config "$LIVE/kind-cluster.yaml"
@@ -51,17 +73,32 @@ kubectl -n cnpg-system rollout status deployment cnpg-controller-manager --timeo
 
 step "4/8 Keycloak Operator ${KEYCLOAK_VERSION} (CRDs and operator in namespace keycloak)"
 kubectl apply -f "$LIVE/00-namespaces.yaml"
-kubectl apply -f "$KC_RES/keycloaks.k8s.keycloak.org-v1.yml"
-kubectl apply -f "$KC_RES/keycloakrealmimports.k8s.keycloak.org-v1.yml"
+# All four CRDs of the release (its kustomization.yml lists the same set). The
+# operator starts a controller per CRD, and a missing CRD keeps it from
+# becoming ready: KeycloakOIDCClient and KeycloakSAMLClient are new in 26.x.
+for crd in keycloaks keycloakrealmimports keycloakoidcclients keycloaksamlclients; do
+  kubectl apply -f "$KC_RES/${crd}.k8s.keycloak.org-v1.yml"
+  kubectl wait --for=condition=Established "crd/${crd}.k8s.keycloak.org" --timeout=60s
+done
 kubectl -n keycloak apply -f "$KC_RES/kubernetes.yml"
-kubectl -n keycloak rollout status deployment keycloak-operator --timeout=300s
+if ! kubectl -n keycloak rollout status deployment keycloak-operator --timeout=300s; then
+  diagnose keycloak "app.kubernetes.io/name=keycloak-operator"
+  exit 1
+fi
 
 step "5/8 PostgreSQL cluster and Keycloak (2 + 2 pods)"
 kubectl apply -f "$LIVE/10-postgres.yaml"
-kubectl -n keycloak wait cluster.postgresql.cnpg.io/keycloak-db --for=condition=Ready --timeout=600s
+kubectl -n keycloak wait cluster.postgresql.cnpg.io/keycloak-db --for=condition=Ready --timeout=600s \
+  || { diagnose keycloak "cnpg.io/cluster=keycloak-db"; exit 1; }
 kubectl apply -f "$LIVE/30-issuer-discovery.yaml"
+# Copy of the cluster CA under a name without dots (see 20-keycloak.yaml).
+# A copy does not follow CA rotation; fine for a lab, not for production.
+kubectl -n keycloak create configmap kubernetes-ca \
+  --from-literal=ca.crt="$(kubectl -n keycloak get configmap kube-root-ca.crt -o jsonpath='{.data.ca\.crt}')" \
+  --dry-run=client -o yaml | kubectl apply -f -
 kubectl apply -f "$LIVE/20-keycloak.yaml"
-kubectl -n keycloak wait keycloak/keycloak --for=condition=Ready --timeout=600s
+kubectl -n keycloak wait keycloak/keycloak --for=condition=Ready --timeout=600s \
+  || { diagnose keycloak "app.kubernetes.io/instance=keycloak"; exit 1; }
 
 step "6/8 port-forward 8080 -> keycloak-service"
 if [[ -f "$WORK/port-forward.pid" ]] && kill -0 "$(cat "$WORK/port-forward.pid")" 2>/dev/null; then :; else

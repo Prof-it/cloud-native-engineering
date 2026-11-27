@@ -2,7 +2,7 @@
 # KeycloakRealmImport creates a realm if it does not exist. It never updates or
 # deletes one: change accessTokenLifespan below, apply again, and the realm in
 # Keycloak keeps the old value (scripts/live-verify.sh checks this).
-apiVersion: k8s.keycloak.org/v2alpha1
+apiVersion: k8s.keycloak.org/v2beta1
 kind: KeycloakRealmImport
 metadata:
   name: sandbox

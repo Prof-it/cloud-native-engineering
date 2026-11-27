@@ -16,11 +16,12 @@ resource "keycloak_kubernetes_identity_provider" "cluster" {
 # Client authentication flow: a copy of the built-in "clients" flow plus the
 # federated-jwt authenticator, so that clients using a secret or a signed JWT
 # keep working. Binding a flow with federated-jwt alone would lock them out.
+# No provider_id: with copy_from the copy keeps the type of its source
+# ("client-flow"), and the provider rejects setting both.
 resource "keycloak_authentication_flow" "clients_federated" {
-  realm_id    = keycloak_realm.platform.id
-  alias       = "clients-with-federated-jwt"
-  provider_id = "client-flow"
-  copy_from   = "clients"
+  realm_id  = keycloak_realm.platform.id
+  alias     = "clients-with-federated-jwt"
+  copy_from = "clients"
 }
 
 resource "keycloak_authentication_execution" "federated_jwt" {

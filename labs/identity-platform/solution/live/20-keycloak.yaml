@@ -1,7 +1,7 @@
 # Keycloak 26.8.2 managed by the Keycloak Operator 26.8.2.
 # Two instances share sessions through the embedded Infinispan cache; the
 # operator configures the cluster discovery and the database.
-apiVersion: k8s.keycloak.org/v2alpha1
+apiVersion: k8s.keycloak.org/v2beta1
 kind: Keycloak
 metadata:
   name: keycloak
@@ -34,10 +34,14 @@ spec:
     strict: true
   # The cluster CA, so that Keycloak can fetch the service-account issuer's
   # discovery document and JWKS from the API server over TLS.
+  # Not kube-root-ca.crt directly: the operator 26.8.2 derives the volume name
+  # from the ConfigMap name ("truststore-configmap-kube-root-ca.crt"), and
+  # volume names must not contain dots, so the StatefulSet is rejected (422)
+  # and no pod is ever created. live-up.sh copies the CA into kubernetes-ca.
   truststores:
     kubernetes-ca:
       configMap:
-        name: kube-root-ca.crt
+        name: kubernetes-ca
   networkPolicy:
     enabled: true
   scheduling:

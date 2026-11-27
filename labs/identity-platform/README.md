@@ -25,7 +25,7 @@ By the end you can explain and enforce:
 ## Prerequisites
 
 - **Offline:** Python 3.9 or later. Nothing else; no network.
-- **Live, local:** Docker, [kind](https://kind.sigs.k8s.io/), kubectl, Terraform 1.11+ (OpenTofu works only in a release with ephemeral variables and write-only arguments; not tested), curl, about 6 GB of free memory. The scripts download pinned releases: CloudNativePG 1.30.2, Keycloak Operator and CRDs 26.8.2, the `keycloak/keycloak` provider 5.11.0, and the images `quay.io/keycloak/keycloak:26.8.2` and `python:3.13-slim`.
+- **Live, local:** a running container engine (Docker Desktop, Colima, OrbStack or Docker Engine; Podman with `KIND_EXPERIMENTAL_PROVIDER=podman`) with about 6 GB of memory, [kind](https://kind.sigs.k8s.io/), kubectl, Terraform 1.11+ (OpenTofu works only in a release with ephemeral variables and write-only arguments; not tested), curl. `./scripts/setup.sh --live` prepares the engine: it starts an installed one, or on macOS offers to install and start Colima with Homebrew (it asks first). Plain `setup.sh` only checks and changes nothing. `live-up.sh` runs the same preparation (`LAB_NO_START=1` to only check). The scripts download pinned releases: CloudNativePG 1.30.2, Keycloak Operator and CRDs 26.8.2, the `keycloak/keycloak` provider 5.11.0, and the images `quay.io/keycloak/keycloak:26.8.2` and `python:3.13-slim`.
 
 ## Scenario
 
@@ -175,6 +175,7 @@ flowchart LR
 6. **Bring it up.**
 
    ```sh
+   ./scripts/setup.sh --live
    ./scripts/live-up.sh
    ```
 
